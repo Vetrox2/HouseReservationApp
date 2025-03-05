@@ -3,16 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HouseReservationApp.Models.DB
 {
-    public class HouseReservationContex : DbContext
+    public class HouseReservationContext(DbContextOptions<HouseReservationContext> options) : DbContext(options)
     {
         public DbSet<User> Users { get; set; }
         public DbSet<House> Houses { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-        {
-            options.UseSqlServer("your_connection_string_here");
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
