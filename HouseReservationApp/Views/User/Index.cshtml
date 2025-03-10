@@ -1,0 +1,10 @@
+﻿@using HouseReservationApp.Models.DB.Entities
+@model List<User>
+
+<h1>User List</h1>
+<ul>
+    @foreach (var user in Model)
+    {
+        <li>@user.Id. @user.FirstName @user.LastName, @user.Email, @user.Phone, @user.CreatedAt.ToString("dd/MM/yyyy")</li>
+    }
+</ul>
