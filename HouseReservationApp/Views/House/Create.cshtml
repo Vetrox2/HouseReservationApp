@@ -1,0 +1,16 @@
+﻿@model HouseReservationApp.Models.DB.Entities.House
+
+<div class="row">
+	<div class="col-md-4">
+		<form asp-action="Create" method="post">
+			<div class="form-group">
+				@Html.AntiForgeryToken()
+				<label asp-for="Title" class="control-label"></label>
+				<input asp-for="Title" />
+			</div>
+			@* <select asp-for="PostalCode" asp-items="Html.GetEnumSelectList<Reser>"> for enum in reservations
+
+			</select> *@
+		</form>
+	</div>
+</div>

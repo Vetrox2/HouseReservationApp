@@ -15,6 +15,7 @@
 
         [Required]
         [StringLength(200)]
+        [Display(Name = "House name")]
         public string Title { get; set; }
 
         [Required]
