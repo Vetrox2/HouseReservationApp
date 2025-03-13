@@ -26,6 +26,18 @@ namespace HouseReservationApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("FirstName,LastName,BankAccount,Phone,Email,PasswordHash")] User user)
         {
+            if (await _dbContext.Users.AnyAsync(u => u.Email == user.Email))
+            {
+                ModelState.AddModelError("Email", "Email address is already taken.");
+                return View(user);
+            }
+
+            if (await _dbContext.Users.AnyAsync(u => u.BankAccount == user.BankAccount))
+            {
+                ModelState.AddModelError("BankAccount", "Bank account is already taken.");
+                return View(user);
+            }
+
             if (ModelState.IsValid)
             {
                 user.PasswordHash = HashService.HashPassword(user.PasswordHash);
@@ -60,6 +72,12 @@ namespace HouseReservationApp.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("FirstName,LastName,BankAccount,Phone")] UserEditViewModel viewModel)
         {
             if (!ModelState.IsValid) return View(viewModel);
+
+            if (await _dbContext.Users.AnyAsync(u => u.BankAccount == viewModel.BankAccount))
+            {
+                ModelState.AddModelError("BankAccount", "Bank account is already taken.");
+                return View(viewModel);
+            }
 
             var existingUser = await _dbContext.Users.FindAsync(id);
             if (existingUser == null) return NotFound();
