@@ -1,10 +1,45 @@
 ﻿@using HouseReservationApp.Models.DB.Entities
 @model List<User>
 
-<h1>User List</h1>
-<ul>
-    @foreach (var user in Model)
-    {
-        <li>@user.Id. @user.FirstName @user.LastName, @user.Email, @user.Phone, @user.CreatedAt.ToString("dd/MM/yyyy")</li>
-    }
-</ul>
+<h1 class="mb-5">User List</h1>
+<a asp-action="Create" class="btn btn-success mb-3">Add User</a>
+
+<table class="table table-hover table-striped">
+	<caption>List of users</caption>
+	<thead class="table-primary">
+		<tr>
+			<th scope="col">ID</th>
+			<th scope="col">First Name</th>
+			<th scope="col">Last Name</th>
+			<th scope="col">Email</th>
+			<th scope="col">Phone Number</th>
+			<th scope="col">Bank Account</th>
+			<th scope="col">Created at</th>
+			<th scope="col"></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var user in Model)
+		{
+			<tr>
+				<td class="align-middle">@user.Id</td>
+				<td class="align-middle">@user.FirstName</td>
+				<td class="align-middle">@user.LastName</td>
+				<td class="align-middle">@user.Email</td>
+				<td class="align-middle">@user.Phone</td>
+				<td class="align-middle">@user.BankAccount</td>
+				<td class="align-middle">@user.CreatedAt.ToString("dd/MM/yyyy")</td>
+				<td class="pe-0 align-middle d-flex gap-1">
+					<a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-primary"><i class="bi bi-pencil-square"></i></a>
+					<form asp-action="Delete" method="post">
+						@Html.AntiForgeryToken()
+						<input type="hidden" name="id" value="@user.Id" />
+						<button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete @user.FirstName @user.LastName?');">
+							<i class="bi bi-trash"></i>
+						</button>
+					</form>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
