@@ -59,7 +59,7 @@
         [ForeignKey("OwnerId")]
         public User Owner { get; set; }
 
-        public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+        public ICollection<Reservation> Reservations { get; set; } = [];
     }
 
 }
