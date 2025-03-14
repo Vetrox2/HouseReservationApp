@@ -5,9 +5,12 @@ A simple ASP.NET Core MVC application for house reservations, built with Entity 
 ## 🔹 Tech Stack  
 
 - **ASP.NET Core MVC**  
-- **Entity Framework Core**  
-- **Authentication System** (Basic User Login/Register)  
-- **Fake Data for Listings & Reservations**  
+- **Entity Framework Core**
+- **Microsoft SQL Server**  
+- **Bootstrap**
+- **Bootstrap Icons**
+- **Authentication System** (Basic User Login/Register)
+- **BCrypt** (for password hashing)
 
 
 ## 🔹 Features
