@@ -1,10 +1,15 @@
-﻿namespace HouseReservationApp.Services
+﻿using HouseReservationApp.Models.DB.Entities;
+using System.Linq.Expressions;
+
+namespace HouseReservationApp.Services
 {
-    public interface IRepository<T> where T : class
+    public interface IRepository<T> where T : class, IEntity
     {
-        Task<IQueryable<T>> GetAll();
-        Task<T?> Get(int id);
-        Task Update(T item);
-        Task<bool> Delete(int id);
+        IQueryable<T> GetAll();
+        Task<T?> GetByIdAsync(int id);
+        Task UpdateAsync(T item);
+        Task<bool> DeleteAsync(int id);
+        Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
+        Task AddAsync(T item);
     }
 }
