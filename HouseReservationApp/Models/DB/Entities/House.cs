@@ -22,6 +22,9 @@
         public string Description { get; set; }
 
         [Required]
+        public string ImageUrl { get; set; }
+
+        [Required]
         [Column(TypeName = "decimal(10,2)")]
         public decimal PricePerNight { get; set; }
 
