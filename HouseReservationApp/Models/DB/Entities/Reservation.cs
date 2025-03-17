@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HouseReservationApp.Models.DB.Entities
 {
-    public class Reservation
+    public class Reservation : IEntity
     {
         [Key]
         public int Id { get; set; }
