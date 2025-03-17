@@ -7,13 +7,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HouseReservationApp.Controllers
 {
-    public class UserController(HouseReservationContext dbContext) : Controller
+    public class UserController(IRepository<User> repository) : Controller
     {
-        private readonly HouseReservationContext _dbContext = dbContext;
+        private readonly IRepository<User> _repository = repository;
 
         public async Task<IActionResult> Index()
         {
-            var users = await _dbContext.Users.ToListAsync();
+            var users = await _repository.GetAll().ToListAsync();
             return View(users);
         }
 
@@ -26,13 +26,13 @@ namespace HouseReservationApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("FirstName,LastName,BankAccount,Phone,Email,PasswordHash")] User user)
         {
-            if (await _dbContext.Users.AnyAsync(u => u.Email == user.Email))
+            if (await _repository.ExistsAsync(u => u.Email == user.Email))
             {
                 ModelState.AddModelError("Email", "Email address is already taken.");
                 return View(user);
             }
 
-            if (await _dbContext.Users.AnyAsync(u => u.BankAccount == user.BankAccount))
+            if (await _repository.ExistsAsync(u => u.BankAccount == user.BankAccount))
             {
                 ModelState.AddModelError("BankAccount", "Bank account is already taken.");
                 return View(user);
@@ -42,8 +42,7 @@ namespace HouseReservationApp.Controllers
             {
                 user.PasswordHash = HashService.HashPassword(user.PasswordHash);
 
-                _dbContext.Users.Add(user);
-                await _dbContext.SaveChangesAsync();
+                await _repository.AddAsync(user);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -52,7 +51,7 @@ namespace HouseReservationApp.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
-            var user = await _dbContext.Users.FindAsync(id);
+            var user = await _repository.GetByIdAsync(id);
             if (user == null) return NotFound();
 
             var viewModel = new UserEditViewModel
@@ -73,13 +72,13 @@ namespace HouseReservationApp.Controllers
         {
             if (!ModelState.IsValid) return View(viewModel);
 
-            if (await _dbContext.Users.AnyAsync(u => u.BankAccount == viewModel.BankAccount))
+            if (await _repository.ExistsAsync(u => u.BankAccount == viewModel.BankAccount))
             {
                 ModelState.AddModelError("BankAccount", "Bank account is already taken.");
                 return View(viewModel);
             }
 
-            var existingUser = await _dbContext.Users.FindAsync(id);
+            var existingUser = await _repository.GetByIdAsync(id);
             if (existingUser == null) return NotFound();
 
             existingUser.FirstName = viewModel.FirstName;
@@ -87,22 +86,13 @@ namespace HouseReservationApp.Controllers
             existingUser.BankAccount = viewModel.BankAccount;
             existingUser.Phone = viewModel.Phone;
 
-            await _dbContext.SaveChangesAsync();
+            await _repository.UpdateAsync(existingUser);
             return RedirectToAction(nameof(Index));
 
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var user = await _dbContext.Users.FindAsync(id);
-            if (user == null) return NotFound();
-
-            _dbContext.Users.Remove(user);
-            await _dbContext.SaveChangesAsync();
-
-            return RedirectToAction("Index");
-        }
+        public async Task<IActionResult> Delete(int id) => await _repository.DeleteAsync(id) ? RedirectToAction("Index") : NotFound();
     }
 }
