@@ -72,7 +72,7 @@ namespace HouseReservationApp.Controllers
         {
             if (!ModelState.IsValid) return View(viewModel);
 
-            if (await _repository.ExistsAsync(u => u.BankAccount == viewModel.BankAccount))
+            if (await _repository.ExistsAsync(u => u.BankAccount == viewModel.BankAccount && u.Id != id))
             {
                 ModelState.AddModelError("BankAccount", "Bank account is already taken.");
                 return View(viewModel);
