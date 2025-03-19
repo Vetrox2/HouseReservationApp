@@ -5,7 +5,7 @@
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
-    public class House
+    public class House : IEntity
     {
         [Key]
         public int Id { get; set; }
@@ -20,6 +20,9 @@
 
         [Required]
         public string Description { get; set; }
+
+        [Required]
+        public string ImageUrl { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(10,2)")]
@@ -59,7 +62,7 @@
         [ForeignKey("OwnerId")]
         public User Owner { get; set; }
 
-        public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+        public ICollection<Reservation> Reservations { get; set; } = [];
     }
 
 }
