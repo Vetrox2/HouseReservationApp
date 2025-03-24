@@ -12,6 +12,7 @@ builder.Services.AddDbContext<HouseReservationContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUserService, UserService>();
 
 
 var app = builder.Build();
