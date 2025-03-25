@@ -84,7 +84,17 @@ namespace HouseReservationApp.Services
             return await _repository.DeleteAsync(id);
         }
 
-        public async Task<PagedResult<User>> GetPaginatedUsersAsync(int page, int pageSize)
-            => await _repository.GetPaginatedAsync(page, pageSize);
+        public async Task<PagedResult<User>> GetPaginatedUsersAsync(string firstName, string lastName, int page, int pageSize)
+        {
+            var query = _repository.GetAll();
+
+            if (!string.IsNullOrWhiteSpace(firstName))
+                query = query.Where(u => u.FirstName.ToLower().Contains(firstName.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(lastName))
+                query = query.Where(u => u.LastName.ToLower().Contains(lastName.ToLower()));
+
+            return await _repository.GetPaginatedAsync(page, pageSize, query);
+        }
     }
 }
