@@ -1,4 +1,5 @@
 ﻿
+using HouseReservationApp.Models;
 using HouseReservationApp.Models.DB;
 using HouseReservationApp.Models.DB.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +34,17 @@ namespace HouseReservationApp.Services
         {
             _dbSet.Add(item);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<PagedResult<T>> GetPaginatedAsync(int page, int pageSize)
+        {
+            var totalCount = await _dbSet.CountAsync();
+            var items = await _dbSet
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<T>(items, totalCount, page, pageSize);
         }
     }
 }

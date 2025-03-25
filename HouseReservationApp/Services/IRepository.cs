@@ -1,4 +1,5 @@
-﻿using HouseReservationApp.Models.DB.Entities;
+﻿using HouseReservationApp.Models;
+using HouseReservationApp.Models.DB.Entities;
 using System.Linq.Expressions;
 
 namespace HouseReservationApp.Services
@@ -11,5 +12,6 @@ namespace HouseReservationApp.Services
         Task<bool> DeleteAsync(int id);
         Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
         Task AddAsync(T item);
+        Task<PagedResult<T>> GetPaginatedAsync(int page, int pageSize);
     }
 }
