@@ -12,6 +12,6 @@ namespace HouseReservationApp.Services
         Task<bool> DeleteAsync(int id);
         Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
         Task AddAsync(T item);
-        Task<PagedResult<T>> GetPaginatedAsync(int page, int pageSize);
+        Task<PagedResult<T>> GetPaginatedAsync(int page, int pageSize, IQueryable<T>? query = null);
     }
 }

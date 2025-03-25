@@ -36,10 +36,12 @@ namespace HouseReservationApp.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<PagedResult<T>> GetPaginatedAsync(int page, int pageSize)
+        public async Task<PagedResult<T>> GetPaginatedAsync(int page, int pageSize, IQueryable<T>? query = null)
         {
-            var totalCount = await _dbSet.CountAsync();
-            var items = await _dbSet
+            query ??= _dbSet;
+
+            var totalCount = await query.CountAsync();
+            var items = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
