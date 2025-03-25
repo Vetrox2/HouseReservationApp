@@ -5,14 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HouseReservationApp.Controllers
 {
-    public class UserController : Controller
+    public class UserController(IUserService userService) : Controller
     {
-        private readonly IUserService _userService;
-
-        public UserController(IUserService userService)
-        {
-            _userService = userService;
-        }
+        private readonly IUserService _userService = userService;
 
         public async Task<IActionResult> Index()
         {
@@ -27,7 +22,7 @@ namespace HouseReservationApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FirstName,LastName,BankAccount,Phone,Email,Password")] UserCreateViewModel viewModel)
+        public async Task<IActionResult> Create([Bind("FirstName,LastName,BankAccount,Phone,Email,Password,ConfirmPassword")] UserCreateViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
@@ -86,10 +81,8 @@ namespace HouseReservationApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var success = await _userService.DeleteUserAsync(id);
-            return success ? RedirectToAction("Index") : NotFound();
-        }
+        public async Task<IActionResult> Delete(int id) 
+            => await _userService.DeleteUserAsync(id) ? RedirectToAction("Index") : NotFound();
+
     }
 }
