@@ -9,10 +9,13 @@ namespace HouseReservationApp.Controllers
     {
         private readonly IUserService _userService = userService;
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
-            var users = await _userService.GetAllUsersAsync();
-            return View(users);
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 10;
+
+            var pagedResult = await _userService.GetPaginatedUsersAsync(page, pageSize);
+            return View(pagedResult);
         }
 
         public IActionResult Create()
