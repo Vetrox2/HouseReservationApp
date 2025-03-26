@@ -2,6 +2,7 @@
 using HouseReservationApp.Models.ViewModels;
 using HouseReservationApp.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace HouseReservationApp.Services
 {
@@ -89,7 +90,7 @@ namespace HouseReservationApp.Services
             return await _repository.DeleteAsync(id);
         }
 
-        public async Task<PagedResult<User>> GetPaginatedUsersAsync(string firstName, string lastName, int page, int pageSize)
+        public async Task<PagedResult<User>> GetPaginatedUsersAsync(string firstName, string lastName, int page, int pageSize, string? sortBy = null, SortDirection? sortDirection = null)
         {
             var query = _repository.GetAll();
 
@@ -98,6 +99,35 @@ namespace HouseReservationApp.Services
 
             if (!string.IsNullOrWhiteSpace(lastName))
                 query = query.Where(u => u.LastName.ToLower().Contains(lastName.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(sortBy) && sortDirection.HasValue)
+            {
+                query = sortBy.ToLower() switch
+                {
+                    "id" => sortDirection == SortDirection.Ascending 
+                        ? query.OrderBy(u => u.Id) 
+                        : query.OrderByDescending(u => u.Id),
+                    "firstname" => sortDirection == SortDirection.Ascending
+                        ? query.OrderBy(u => u.FirstName)
+                        : query.OrderByDescending(u => u.FirstName),
+                    "lastname" => sortDirection == SortDirection.Ascending
+                        ? query.OrderBy(u => u.LastName)
+                        : query.OrderByDescending(u => u.LastName),
+                    "email" => sortDirection == SortDirection.Ascending
+                        ? query.OrderBy(u => u.Email)
+                        : query.OrderByDescending(u => u.Email),
+                    "phone" => sortDirection == SortDirection.Ascending
+                        ? query.OrderBy(u => u.Phone)
+                        : query.OrderByDescending(u => u.Phone),
+                    "bankaccount" => sortDirection == SortDirection.Ascending
+                        ? query.OrderBy(u => u.BankAccount)
+                        : query.OrderByDescending(u => u.BankAccount),
+                    "createdat" => sortDirection == SortDirection.Ascending
+                        ? query.OrderBy(u => u.CreatedAt)
+                        : query.OrderByDescending(u => u.CreatedAt),
+                    _ => query
+                };
+            }
 
             return await _repository.GetPaginatedAsync(page, pageSize, query);
         }
