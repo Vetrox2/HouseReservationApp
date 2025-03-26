@@ -3,12 +3,24 @@ using HouseReservationApp.Models.ViewModels;
 using HouseReservationApp.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using System.Linq.Expressions;
 
 namespace HouseReservationApp.Services
 {
     public class UserService(IRepository<User> repository) : IUserService
     {
         private readonly IRepository<User> _repository = repository;
+
+        private static readonly Dictionary<string, Expression<Func<User, object>>> _propertyAccessors = new(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Id", u => u.Id },
+            { "FirstName", u => u.FirstName },
+            { "LastName", u => u.LastName },
+            { "Email", u => u.Email },
+            { "Phone", u => u.Phone },
+            { "BankAccount", u => u.BankAccount },
+            { "CreatedAt", u => u.CreatedAt }
+        };
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
@@ -90,46 +102,24 @@ namespace HouseReservationApp.Services
             return await _repository.DeleteAsync(id);
         }
 
-        public async Task<PagedResult<User>> GetPaginatedUsersAsync(string firstName, string lastName, int page, int pageSize, string? sortBy = null, SortDirection? sortDirection = null)
+        public async Task<PagedResult<User>> GetPaginatedUsersAsync(UserIndexParams parameters)
         {
             var query = _repository.GetAll();
 
-            if (!string.IsNullOrWhiteSpace(firstName))
-                query = query.Where(u => u.FirstName.ToLower().Contains(firstName.ToLower()));
+            if (!string.IsNullOrWhiteSpace(parameters.FirstName))
+                query = query.Where(u => u.FirstName.ToLower().Contains(parameters.FirstName.ToLower()));
 
-            if (!string.IsNullOrWhiteSpace(lastName))
-                query = query.Where(u => u.LastName.ToLower().Contains(lastName.ToLower()));
+            if (!string.IsNullOrWhiteSpace(parameters.LastName))
+                query = query.Where(u => u.LastName.ToLower().Contains(parameters.LastName.ToLower()));
 
-            if (!string.IsNullOrWhiteSpace(sortBy) && sortDirection.HasValue)
+            if (!string.IsNullOrWhiteSpace(parameters.SortBy) && parameters.SortDirection.HasValue && _propertyAccessors.TryGetValue(parameters.SortBy, out var accessor))
             {
-                query = sortBy.ToLower() switch
-                {
-                    "id" => sortDirection == SortDirection.Ascending 
-                        ? query.OrderBy(u => u.Id) 
-                        : query.OrderByDescending(u => u.Id),
-                    "firstname" => sortDirection == SortDirection.Ascending
-                        ? query.OrderBy(u => u.FirstName)
-                        : query.OrderByDescending(u => u.FirstName),
-                    "lastname" => sortDirection == SortDirection.Ascending
-                        ? query.OrderBy(u => u.LastName)
-                        : query.OrderByDescending(u => u.LastName),
-                    "email" => sortDirection == SortDirection.Ascending
-                        ? query.OrderBy(u => u.Email)
-                        : query.OrderByDescending(u => u.Email),
-                    "phone" => sortDirection == SortDirection.Ascending
-                        ? query.OrderBy(u => u.Phone)
-                        : query.OrderByDescending(u => u.Phone),
-                    "bankaccount" => sortDirection == SortDirection.Ascending
-                        ? query.OrderBy(u => u.BankAccount)
-                        : query.OrderByDescending(u => u.BankAccount),
-                    "createdat" => sortDirection == SortDirection.Ascending
-                        ? query.OrderBy(u => u.CreatedAt)
-                        : query.OrderByDescending(u => u.CreatedAt),
-                    _ => query
-                };
+                query = parameters.SortDirection == SortDirection.Ascending
+                ? query.OrderBy(accessor)
+                : query.OrderByDescending(accessor);
             }
 
-            return await _repository.GetPaginatedAsync(page, pageSize, query);
+            return await _repository.GetPaginatedAsync(parameters.Page, parameters.PageSize, query);
         }
     }
 }

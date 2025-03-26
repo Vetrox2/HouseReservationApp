@@ -10,25 +10,17 @@ namespace HouseReservationApp.Controllers
     {
         private readonly IUserService _userService = userService;
 
-        public async Task<IActionResult> Index(string firstName, string lastName, int page = 1, int pageSize = 10, string? sortBy = null, string? sortDirection = null)
+        public async Task<IActionResult> Index(UserIndexParams parameters)
         {
-            if (page < 1) page = 1;
-            if (pageSize < 1) pageSize = 10;
+            if (parameters.Page < 1) parameters = parameters with { Page = 1 };
+            if (parameters.PageSize < 1) parameters = parameters with { PageSize = 10 };
 
-            SortDirection? direction = null;
-            if (!string.IsNullOrWhiteSpace(sortDirection))
-            {
-                direction = sortDirection.ToLower() == "desc"
-                    ? SortDirection.Descending
-                    : SortDirection.Ascending;
-            }
+            var pagedResult = await _userService.GetPaginatedUsersAsync(parameters);
 
-            var pagedResult = await _userService.GetPaginatedUsersAsync(firstName, lastName, page, pageSize, sortBy, direction);
-
-            ViewData["FirstName"] = firstName;
-            ViewData["LastName"] = lastName;
-            ViewData["SortBy"] = sortBy;
-            ViewData["SortDirection"] = sortDirection;
+            ViewData["FirstName"] = parameters.FirstName;
+            ViewData["LastName"] = parameters.LastName;
+            ViewData["SortBy"] = parameters.SortBy;
+            ViewData["SortDirection"] = parameters.SortDirection?.ToString();
 
             return View(pagedResult);
         }

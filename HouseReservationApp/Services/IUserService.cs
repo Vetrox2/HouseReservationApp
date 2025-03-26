@@ -12,6 +12,6 @@ namespace HouseReservationApp.Services
         Task<ServiceResult> CreateUserAsync(UserCreateViewModel viewModel);
         Task<ServiceResult> UpdateUserAsync(int id, UserEditViewModel viewModel);
         Task<bool> DeleteUserAsync(int id);
-        Task<PagedResult<User>> GetPaginatedUsersAsync(string firstName, string lastName, int page, int pageSize, string? sortBy = null, SortDirection? sortDirection = null);
+        Task<PagedResult<User>> GetPaginatedUsersAsync(UserIndexParams parameters);
     }
 }

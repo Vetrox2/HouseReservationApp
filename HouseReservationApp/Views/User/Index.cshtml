@@ -2,6 +2,15 @@
 @model PagedResult<User>
 
 @{
+    var baseParams = new UserIndexParams(
+        FirstName: ViewData["FirstName"]?.ToString(),
+        LastName: ViewData["LastName"]?.ToString(),
+        Page: Model.CurrentPage,
+        PageSize: Model.PageSize,
+        SortBy: ViewData["SortBy"]?.ToString(),
+        SortDirection: ViewData["SortDirection"]?.ToString() == "Ascending" ? SortDirection.Ascending : ViewData["SortDirection"]?.ToString() == "Descending" ? SortDirection.Descending : null
+    );
+
     var columns = new[]
     {
     new { Name = "Id", Display = "ID" },
@@ -21,20 +30,20 @@
     <div class="row">
         <div class="col-md-4">
             <label for="firstName">First Name</label>
-            <input type="text" name="firstName" value="@ViewData["FirstName"]" class="form-control" />
+            <input type="text" name="FirstName" value="@ViewData["FirstName"]" class="form-control" />
         </div>
         <div class="col-md-4">
             <label for="lastName">Last Name</label>
-            <input type="text" name="lastName" value="@ViewData["LastName"]" class="form-control" />
+            <input type="text" name="LastName" value="@ViewData["LastName"]" class="form-control" />
         </div>
         <div class="col-md-4 d-flex align-items-end">
             <button type="submit" class="btn btn-primary">Filter</button>
         </div>
     </div>
-    <input type="hidden" name="page" value="1" />
-    <input type="hidden" name="pageSize" value="@Model.PageSize" />
-    <input type="hidden" name="sortBy" value="@ViewData["SortBy"]" />
-    <input type="hidden" name="sortDirection" value="@ViewData["SortDirection"]" />
+    <input type="hidden" name="Page" value="1" />
+    <input type="hidden" name="PageSize" value="@Model.PageSize" />
+    <input type="hidden" name="SortBy" value="@ViewData["SortBy"]" />
+    <input type="hidden" name="SortDirection" value="@ViewData["SortDirection"]" />
 </form>
 
 <table class="table table-hover table-striped">
@@ -44,15 +53,15 @@
         <tr>
             @foreach (var column in columns)
             {
+                var sortParams = baseParams with 
+                {
+                    Page = 1,
+                    SortBy = column.Name,
+                    SortDirection = ViewData["SortBy"]?.ToString() == column.Name && ViewData["SortDirection"]?.ToString() == "Ascending" ? SortDirection.Descending : SortDirection.Ascending
+                };
+                
                 <th scope="col">
-                    <a href="@Url.Action("Index", new {
-                    firstName = ViewData["FirstName"],
-                    lastName = ViewData["LastName"],
-                    page = 1,
-                    pageSize = Model.PageSize,
-                    sortBy = column.Name,
-                    sortDirection = ViewData["SortBy"]?.ToString() == column.Name && ViewData["SortDirection"]?.ToString() == "asc" ? "desc" : "asc"
-                })">
+                    <a href="@Url.Action("Index", sortParams)">
                         @column.Display
                         @if (ViewData["SortBy"]?.ToString() == column.Name)
                         {
@@ -93,23 +102,12 @@
 <div class="d-flex flex-column align-items-center mt-4">
     <p>Showing @(Model.Items.Count()) of @Model.TotalCount users (Page @Model.CurrentPage of @Model.TotalPages)</p>
 
-    @{
-        var baseParams = new Dictionary<string, string?>
-    {
-    { "pageSize", Model.PageSize.ToString() },
-    { "firstName", ViewData["FirstName"]?.ToString() },
-    { "lastName", ViewData["LastName"]?.ToString() },
-    { "sortBy", ViewData["SortBy"]?.ToString() },
-    { "sortDirection", ViewData["SortDirection"]?.ToString() }
-    };
-    }
-
     <nav aria-label="User pagination">
         <ul class="pagination justify-content-center">
             <!-- Previous Button -->
             <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
                 @{
-                    var prevParams = new Dictionary<string, string>(baseParams) { { "page", (Model.CurrentPage - 1).ToString() } };
+                    var prevParams =baseParams with { Page = Model.CurrentPage - 1 } ;
                 }
                 <a class="page-link"
                    href="@(Model.CurrentPage > 1 ? Url.Action("Index", prevParams) : "#")"
@@ -125,7 +123,7 @@
 
                 if (startPage > 1)
                 {
-                    var firstPageParams = new Dictionary<string, string>(baseParams) { { "page", "1" } };
+                    var firstPageParams = baseParams with { Page = 1 };
                     <li class="page-item">
                         <a class="page-link" href="@Url.Action("Index", firstPageParams)">1</a>
                     </li>
@@ -137,7 +135,7 @@
 
                 for (int i = startPage; i <= endPage; i++)
                 {
-                    var pageParams = new Dictionary<string, string>(baseParams) { { "page", i.ToString() } };
+                    var pageParams = baseParams with { Page = i };
                     <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
                         <a class="page-link" href="@Url.Action("Index", pageParams)">@i</a>
                     </li>
@@ -149,7 +147,8 @@
                     {
                         <li class="page-item disabled"><span class="page-link">...</span></li>
                     }
-                    var lastPageParams = new Dictionary<string, string>(baseParams) { { "page", Model.TotalPages.ToString() } };
+
+                    var lastPageParams = baseParams with { Page = Model.TotalPages };
                     <li class="page-item">
                         <a class="page-link" href="@Url.Action("Index", lastPageParams)">@Model.TotalPages</a>
                     </li>
@@ -159,7 +158,7 @@
             <!-- Next Button -->
             <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
                 @{
-                    var nextParams = new Dictionary<string, string>(baseParams) { { "page", (Model.CurrentPage + 1).ToString() } };
+                    var nextParams = baseParams with { Page = Model.CurrentPage + 1 };
                 }
                 <a class="page-link"
                    href="@(Model.CurrentPage < Model.TotalPages ? Url.Action("Index", nextParams) : "#")"
