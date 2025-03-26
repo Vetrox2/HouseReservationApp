@@ -1,4 +1,5 @@
-﻿using HouseReservationApp.Models.DB.Entities;
+﻿using HouseReservationApp.Models;
+using HouseReservationApp.Models.DB.Entities;
 using HouseReservationApp.Models.ViewModels;
 using HouseReservationApp.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -9,14 +10,26 @@ namespace HouseReservationApp.Controllers
     {
         private readonly IUserService _userService = userService;
 
-        public async Task<IActionResult> Index(string firstName, string lastName, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(string firstName, string lastName, int page = 1, int pageSize = 10, string? sortBy = null, string? sortDirection = null)
         {
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 10;
 
-            var pagedResult = await _userService.GetPaginatedUsersAsync(firstName, lastName, page, pageSize);
+            SortDirection? direction = null;
+            if (!string.IsNullOrWhiteSpace(sortDirection))
+            {
+                direction = sortDirection.ToLower() == "desc"
+                    ? SortDirection.Descending
+                    : SortDirection.Ascending;
+            }
+
+            var pagedResult = await _userService.GetPaginatedUsersAsync(firstName, lastName, page, pageSize, sortBy, direction);
+
             ViewData["FirstName"] = firstName;
             ViewData["LastName"] = lastName;
+            ViewData["SortBy"] = sortBy;
+            ViewData["SortDirection"] = sortDirection;
+
             return View(pagedResult);
         }
 
