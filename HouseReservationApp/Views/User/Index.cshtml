@@ -5,121 +5,265 @@
 <a asp-action="Create" class="btn btn-success mb-3">Add User</a>
 
 <form asp-action="Index" method="get" class="mb-4">
-	<div class="row">
-		<div class="col-md-4">
-			<label for="firstName">First Name</label>
-			<input type="text" name="firstName" value="@ViewData["FirstName"]" class="form-control" />
-		</div>
-		<div class="col-md-4">
-			<label for="lastName">Last Name</label>
-			<input type="text" name="lastName" value="@ViewData["LastName"]" class="form-control" />
-		</div>
-		<div class="col-md-4 d-flex align-items-end">
-			<button type="submit" class="btn btn-primary">Filter</button>
-		</div>
-	</div>
+    <div class="row">
+        <div class="col-md-4">
+            <label for="firstName">First Name</label>
+            <input type="text" name="firstName" value="@ViewData["FirstName"]" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label for="lastName">Last Name</label>
+            <input type="text" name="lastName" value="@ViewData["LastName"]" class="form-control" />
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </div>
+    <input type="hidden" name="page" value="1" />
+    <input type="hidden" name="pageSize" value="@Model.PageSize" />
+    <input type="hidden" name="sortBy" value="@ViewData["SortBy"]" />
+    <input type="hidden" name="sortDirection" value="@ViewData["SortDirection"]" />
 </form>
 
 <table class="table table-hover table-striped">
-	<caption>List of users</caption>
-	<thead class="table-primary">
-		<tr>
-			<th scope="col">ID</th>
-			<th scope="col">First Name</th>
-			<th scope="col">Last Name</th>
-			<th scope="col">Email</th>
-			<th scope="col">Phone Number</th>
-			<th scope="col">Bank Account</th>
-			<th scope="col">Created at</th>
-			<th scope="col"></th>
-		</tr>
-	</thead>
-	<tbody>
-		@foreach (var user in Model.Items)
-		{
-			<tr>
-				<td class="align-middle">@user.Id</td>
-				<td class="align-middle">@user.FirstName</td>
-				<td class="align-middle">@user.LastName</td>
-				<td class="align-middle">@user.Email</td>
-				<td class="align-middle">@user.Phone</td>
-				<td class="align-middle">@user.BankAccount</td>
-				<td class="align-middle">@user.CreatedAt.ToString("dd/MM/yyyy")</td>
-				<td class="pe-0 align-middle d-flex gap-1">
-					<a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-primary"><i class="bi bi-pencil-square"></i></a>
-					<form asp-action="Delete" method="post">
-						@Html.AntiForgeryToken()
-						<input type="hidden" name="id" value="@user.Id" />
-						<button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete @user.FirstName @user.LastName?');">
-							<i class="bi bi-trash"></i>
-						</button>
-					</form>
-				</td>
-			</tr>
-		}
-	</tbody>
+    <caption>List of users</caption>
+    <thead class="table-primary">
+        <tr>
+            <th scope="col">
+                <a href="@Url.Action("Index", new {
+                    firstName = ViewData["FirstName"],
+                    lastName = ViewData["LastName"],
+                    page = 1,
+                    pageSize = Model.PageSize,
+                    sortBy = "Id",
+                    sortDirection = (ViewData["SortBy"]?.ToString() == "Id" && ViewData["SortDirection"]?.ToString() == "asc") ? "desc" : "asc"
+                })">
+                    ID
+                    @if (ViewData["SortBy"]?.ToString() == "Id")
+                    {
+                        <span>@(ViewData["SortDirection"]?.ToString() == "asc" ? "↑" : "↓")</span>
+                    }
+                </a>
+            </th>
+            <th scope="col">
+                <a href="@Url.Action("Index", new {
+                    firstName = ViewData["FirstName"],
+                    lastName = ViewData["LastName"],
+                    page = 1,
+                    pageSize = Model.PageSize,
+                    sortBy = "FirstName",
+                    sortDirection = (ViewData["SortBy"]?.ToString() == "FirstName" && ViewData["SortDirection"]?.ToString() == "asc") ? "desc" : "asc"
+                })">
+                    First Name
+                    @if (ViewData["SortBy"]?.ToString() == "FirstName")
+                    {
+                        <span>@(ViewData["SortDirection"]?.ToString() == "asc" ? "↑" : "↓")</span>
+                    }
+                </a>
+            </th>
+            <th scope="col">
+                <a href="@Url.Action("Index", new {
+                    firstName = ViewData["FirstName"],
+                    lastName = ViewData["LastName"],
+                    page = 1,
+                    pageSize = Model.PageSize,
+                    sortBy = "LastName",
+                    sortDirection = (ViewData["SortBy"]?.ToString() == "LastName" && ViewData["SortDirection"]?.ToString() == "asc") ? "desc" : "asc"
+                })">
+                    Last Name
+                    @if (ViewData["SortBy"]?.ToString() == "LastName")
+                    {
+                        <span>@(ViewData["SortDirection"]?.ToString() == "asc" ? "↑" : "↓")</span>
+                    }
+                </a>
+            </th>
+            <th scope="col">
+                <a href="@Url.Action("Index", new {
+                    firstName = ViewData["FirstName"],
+                    lastName = ViewData["LastName"],
+                    page = 1,
+                    pageSize = Model.PageSize,
+                    sortBy = "Email",
+                    sortDirection = (ViewData["SortBy"]?.ToString() == "Email" && ViewData["SortDirection"]?.ToString() == "asc") ? "desc" : "asc"
+                })">
+                    Email
+                    @if (ViewData["SortBy"]?.ToString() == "Email")
+                    {
+                        <span>@(ViewData["SortDirection"]?.ToString() == "asc" ? "↑" : "↓")</span>
+                    }
+                </a>
+            </th>
+            <th scope="col">
+                <a href="@Url.Action("Index", new {
+                    firstName = ViewData["FirstName"],
+                    lastName = ViewData["LastName"],
+                    page = 1,
+                    pageSize = Model.PageSize,
+                    sortBy = "Phone",
+                    sortDirection = (ViewData["SortBy"]?.ToString() == "Phone" && ViewData["SortDirection"]?.ToString() == "asc") ? "desc" : "asc"
+                })">
+                    Phone Number
+                    @if (ViewData["SortBy"]?.ToString() == "Phone")
+                    {
+                        <span>@(ViewData["SortDirection"]?.ToString() == "asc" ? "↑" : "↓")</span>
+                    }
+                </a>
+            </th>
+            <th scope="col">
+                <a href="@Url.Action("Index", new {
+                    firstName = ViewData["FirstName"],
+                    lastName = ViewData["LastName"],
+                    page = 1,
+                    pageSize = Model.PageSize,
+                    sortBy = "BankAccount",
+                    sortDirection = (ViewData["SortBy"]?.ToString() == "BankAccount" && ViewData["SortDirection"]?.ToString() == "asc") ? "desc" : "asc"
+                })">
+                    Bank Account
+                    @if (ViewData["SortBy"]?.ToString() == "BankAccount")
+                    {
+                        <span>@(ViewData["SortDirection"]?.ToString() == "asc" ? "↑" : "↓")</span>
+                    }
+                </a>
+            </th>
+            <th scope="col">
+                <a href="@Url.Action("Index", new {
+                    firstName = ViewData["FirstName"],
+                    lastName = ViewData["LastName"],
+                    page = 1,
+                    pageSize = Model.PageSize,
+                    sortBy = "CreatedAt",
+                    sortDirection = (ViewData["SortBy"]?.ToString() == "CreatedAt" && ViewData["SortDirection"]?.ToString() == "asc") ? "desc" : "asc"
+                })">
+                    Created at
+                    @if (ViewData["SortBy"]?.ToString() == "CreatedAt")
+                    {
+                        <span>@(ViewData["SortDirection"]?.ToString() == "asc" ? "↑" : "↓")</span>
+                    }
+                </a>
+            </th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model.Items)
+        {
+            <tr>
+                <td class="align-middle">@user.Id</td>
+                <td class="align-middle">@user.FirstName</td>
+                <td class="align-middle">@user.LastName</td>
+                <td class="align-middle">@user.Email</td>
+                <td class="align-middle">@user.Phone</td>
+                <td class="align-middle">@user.BankAccount</td>
+                <td class="align-middle">@user.CreatedAt.ToString("dd/MM/yyyy")</td>
+                <td class="pe-0 align-middle d-flex gap-1">
+                    <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-primary"><i class="bi bi-pencil-square"></i></a>
+                    <form asp-action="Delete" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@user.Id" />
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete @user.FirstName @user.LastName?');">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
 </table>
 
 <div class="d-flex flex-column align-items-center mt-4">
-	<p>Showing @(Model.Items.Count()) of @Model.TotalCount users (Page @Model.CurrentPage of @Model.TotalPages)</p>
+    <p>Showing @(Model.Items.Count()) of @Model.TotalCount users (Page @Model.CurrentPage of @Model.TotalPages)</p>
 
-	<nav aria-label="User pagination">
-		<ul class="pagination justify-content-center">
-			<!-- Previous Button -->
-			<li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-				<a class="page-link"
-				   href="@(Model.CurrentPage > 1 ? Url.Action("Index", new { page = Model.CurrentPage - 1, pageSize = Model.PageSize }) : "#")"
-				   aria-label="Previous">
-					<span aria-hidden="true">&laquo;</span>
-				</a>
-			</li>
+    <nav aria-label="User pagination">
+        <ul class="pagination justify-content-center">
+            <!-- Previous Button -->
+            <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link"
+                   href="@(Model.CurrentPage > 1 ? Url.Action("Index", new {
+                       page = Model.CurrentPage - 1,
+                       pageSize = Model.PageSize,
+                       firstName = ViewData["FirstName"],
+                       lastName = ViewData["LastName"],
+                       sortBy = ViewData["SortBy"],
+                       sortDirection = ViewData["SortDirection"]
+                   }) : "#")"
+                   aria-label="Previous">
+                    <span aria-hidden="true">«</span>
+                </a>
+            </li>
 
-			<!-- Page Numbers -->
-			@{
-				int startPage = Math.Max(1, Model.CurrentPage - 2);
-				int endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+            <!-- Page Numbers -->
+            @{
+                int startPage = Math.Max(1, Model.CurrentPage - 2);
+                int endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
 
-				// Always show the first page
-				if (startPage > 1)
-				{
-					<li class="page-item">
-						<a class="page-link" href="@Url.Action("Index", new { page = 1, pageSize = Model.PageSize })">1</a>
-					</li>
-					if (startPage > 2)
-					{
-						<li class="page-item disabled"><span class="page-link">...</span></li>
-					}
-				}
+                // Always show the first page
+                if (startPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new {
+                            page = 1,
+                            pageSize = Model.PageSize,
+                            firstName = ViewData["FirstName"],
+                            lastName = ViewData["LastName"],
+                            sortBy = ViewData["SortBy"],
+                            sortDirection = ViewData["SortDirection"]
+                        })">1</a>
+                    </li>
+                    if (startPage > 2)
+                    {
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    }
+                }
 
-				// Show pages around the current page
-				for (int i = startPage; i <= endPage; i++)
-				{
-					<li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-						<a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = Model.PageSize })">@i</a>
-					</li>
-				}
+                // Show pages around the current page
+                for (int i = startPage; i <= endPage; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new {
+                            page = i,
+                            pageSize = Model.PageSize,
+                            firstName = ViewData["FirstName"],
+                            lastName = ViewData["LastName"],
+                            sortBy = ViewData["SortBy"],
+                            sortDirection = ViewData["SortDirection"]
+                        })">@i</a>
+                    </li>
+                }
 
-				// Always show the last page
-				if (endPage < Model.TotalPages)
-				{
-					if (endPage < Model.TotalPages - 1)
-					{
-						<li class="page-item disabled"><span class="page-link">...</span></li>
-					}
-					<li class="page-item">
-						<a class="page-link" href="@Url.Action("Index", new { page = Model.TotalPages, pageSize = Model.PageSize })">@Model.TotalPages</a>
-					</li>
-				}
-			}
+                // Always show the last page
+                if (endPage < Model.TotalPages)
+                {
+                    if (endPage < Model.TotalPages - 1)
+                    {
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    }
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new {
+                            page = Model.TotalPages,
+                            pageSize = Model.PageSize,
+                            firstName = ViewData["FirstName"],
+                            lastName = ViewData["LastName"],
+                            sortBy = ViewData["SortBy"],
+                            sortDirection = ViewData["SortDirection"]
+                        })">@Model.TotalPages</a>
+                    </li>
+                }
+            }
 
-			<!-- Next Button -->
-			<li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-				<a class="page-link"
-				   href="@(Model.CurrentPage < Model.TotalPages ? Url.Action("Index", new { page = Model.CurrentPage + 1, pageSize = Model.PageSize }) : "#")"
-				   aria-label="Next">
-					<span aria-hidden="true">&raquo;</span>
-				</a>
-			</li>
-		</ul>
-	</nav>
+            <!-- Next Button -->
+            <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                <a class="page-link"
+                   href="@(Model.CurrentPage < Model.TotalPages ? Url.Action("Index", new {
+                       page = Model.CurrentPage + 1,
+                       pageSize = Model.PageSize,
+                       firstName = ViewData["FirstName"],
+                       lastName = ViewData["LastName"],
+                       sortBy = ViewData["SortBy"],
+                       sortDirection = ViewData["SortDirection"]
+                   }) : "#")"
+                   aria-label="Next">
+                    <span aria-hidden="true">»</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 </div>
