@@ -8,6 +8,7 @@ namespace HouseReservationApp.Services
     {
         Task<IEnumerable<User>> GetAllUsersAsync();
         Task<UserEditViewModel?> GetUserEditViewModelAsync(int id);
+        Task<User?> GetUserByEmailAsync(string email);
         Task<ServiceResult> CreateUserAsync(UserCreateViewModel viewModel);
         Task<ServiceResult> UpdateUserAsync(int id, UserEditViewModel viewModel);
         Task<bool> DeleteUserAsync(int id);

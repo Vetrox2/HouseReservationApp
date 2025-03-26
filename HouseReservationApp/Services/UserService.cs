@@ -28,6 +28,11 @@ namespace HouseReservationApp.Services
             };
         }
 
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _repository.GetAll().FirstOrDefaultAsync(u => u.Email == email);
+        }
+
         public async Task<ServiceResult> CreateUserAsync(UserCreateViewModel viewModel)
         {
             var result = new ServiceResult();
