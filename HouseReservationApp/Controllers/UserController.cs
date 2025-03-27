@@ -1,20 +1,28 @@
-﻿using HouseReservationApp.Models.DB;
+﻿using HouseReservationApp.Models;
 using HouseReservationApp.Models.DB.Entities;
 using HouseReservationApp.Models.ViewModels;
 using HouseReservationApp.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace HouseReservationApp.Controllers
 {
-    public class UserController(IRepository<User> repository) : Controller
+    public class UserController(IUserService userService) : Controller
     {
-        private readonly IRepository<User> _repository = repository;
+        private readonly IUserService _userService = userService;
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(UserIndexParams parameters)
         {
-            var users = await _repository.GetAll().ToListAsync();
-            return View(users);
+            if (parameters.Page < 1) parameters = parameters with { Page = 1 };
+            if (parameters.PageSize < 1) parameters = parameters with { PageSize = 10 };
+
+            var pagedResult = await _userService.GetPaginatedUsersAsync(parameters);
+
+            ViewData["FirstName"] = parameters.FirstName;
+            ViewData["LastName"] = parameters.LastName;
+            ViewData["SortBy"] = parameters.SortBy;
+            ViewData["SortDirection"] = parameters.SortDirection?.ToString();
+
+            return View(pagedResult);
         }
 
         public IActionResult Create()
@@ -24,44 +32,33 @@ namespace HouseReservationApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FirstName,LastName,BankAccount,Phone,Email,PasswordHash")] User user)
+        public async Task<IActionResult> Create([Bind("FirstName,LastName,BankAccount,Phone,Email,Password,ConfirmPassword")] UserCreateViewModel viewModel)
         {
-            if (await _repository.ExistsAsync(u => u.Email == user.Email))
-            {
-                ModelState.AddModelError("Email", "Email address is already taken.");
-                return View(user);
-            }
-
-            if (await _repository.ExistsAsync(u => u.BankAccount == user.BankAccount))
-            {
-                ModelState.AddModelError("BankAccount", "Bank account is already taken.");
-                return View(user);
-            }
-
             if (ModelState.IsValid)
             {
-                user.PasswordHash = HashService.HashPassword(user.PasswordHash);
-
-                await _repository.AddAsync(user);
-                return RedirectToAction(nameof(Index));
+                var result = await _userService.CreateUserAsync(viewModel);
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        foreach (var msg in error.Value)
+                        {
+                            ModelState.AddModelError(error.Key, msg);
+                        }
+                    }
+                }
+                else
+                {
+                    return RedirectToAction(nameof(Index));
+                }
             }
-
-            return View(user);
+            return View(viewModel);
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            var user = await _repository.GetByIdAsync(id);
-            if (user == null) return NotFound();
-
-            var viewModel = new UserEditViewModel
-            {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                BankAccount = user.BankAccount,
-                Phone = user.Phone
-            };
-
+            var viewModel = await _userService.GetUserEditViewModelAsync(id);
+            if (viewModel == null) return NotFound();
             ViewData["UserId"] = id;
             return View(viewModel);
         }
@@ -70,29 +67,32 @@ namespace HouseReservationApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("FirstName,LastName,BankAccount,Phone")] UserEditViewModel viewModel)
         {
-            if (!ModelState.IsValid) return View(viewModel);
-
-            if (await _repository.ExistsAsync(u => u.BankAccount == viewModel.BankAccount && u.Id != id))
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError("BankAccount", "Bank account is already taken.");
-                return View(viewModel);
+                var result = await _userService.UpdateUserAsync(id, viewModel);
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        foreach (var msg in error.Value)
+                        {
+                            ModelState.AddModelError(error.Key, msg);
+                        }
+                    }
+                }
+                else
+                {
+                    return RedirectToAction(nameof(Index));
+                }
             }
-
-            var existingUser = await _repository.GetByIdAsync(id);
-            if (existingUser == null) return NotFound();
-
-            existingUser.FirstName = viewModel.FirstName;
-            existingUser.LastName = viewModel.LastName;
-            existingUser.BankAccount = viewModel.BankAccount;
-            existingUser.Phone = viewModel.Phone;
-
-            await _repository.UpdateAsync(existingUser);
-            return RedirectToAction(nameof(Index));
-
+            ViewData["UserId"] = id;
+            return View(viewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id) => await _repository.DeleteAsync(id) ? RedirectToAction("Index") : NotFound();
+        public async Task<IActionResult> Delete(int id) 
+            => await _userService.DeleteUserAsync(id) ? RedirectToAction("Index") : NotFound();
+
     }
 }
