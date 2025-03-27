@@ -1,6 +1,7 @@
-using HouseReservationApp.Models.DB;
-using HouseReservationApp.Models.DB.Entities;
-using HouseReservationApp.Services;
+using HouseReservation.Core.Services.Interfaces;
+using HouseReservation.Infrastructure.Data;
+using HouseReservation.Infrastructure.Repositories;
+using HouseReservation.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

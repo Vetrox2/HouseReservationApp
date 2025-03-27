@@ -1,8 +1,8 @@
-using System.Diagnostics;
-using HouseReservationApp.Models;
+using HouseReservation.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
-namespace HouseReservationApp.Controllers
+namespace HouseReservation.Web.Controllers
 {
     public class HomeController : Controller
     {

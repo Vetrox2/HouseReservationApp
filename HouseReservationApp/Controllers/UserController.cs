@@ -1,10 +1,9 @@
-﻿using HouseReservationApp.Models;
-using HouseReservationApp.Models.DB.Entities;
-using HouseReservationApp.Models.ViewModels;
-using HouseReservationApp.Services;
+﻿using HouseReservation.Contracts.Models.ViewModels;
+using HouseReservation.Core.Services.Interfaces;
+using HouseReservation.Core.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HouseReservationApp.Controllers
+namespace HouseReservation.Web.Controllers
 {
     public class UserController(IUserService userService) : Controller
     {
@@ -91,7 +90,7 @@ namespace HouseReservationApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id) 
+        public async Task<IActionResult> Delete(int id)
             => await _userService.DeleteUserAsync(id) ? RedirectToAction("Index") : NotFound();
 
     }
