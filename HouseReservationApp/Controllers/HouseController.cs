@@ -1,8 +1,8 @@
-﻿using HouseReservationApp.Models.DB;
-using HouseReservationApp.Models.DB.Entities;
+﻿using HouseReservation.Core.Models;
+using HouseReservation.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HouseReservationApp.Controllers
+namespace HouseReservation.Web.Controllers
 {
     public class HouseController : Controller
     {
@@ -25,7 +25,8 @@ namespace HouseReservationApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(House house)
         {
-            if(ModelState.IsValid){
+            if (ModelState.IsValid)
+            {
                 _db.Add(house);
                 await _db.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

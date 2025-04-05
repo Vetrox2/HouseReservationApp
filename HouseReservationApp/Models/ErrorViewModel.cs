@@ -1,4 +1,4 @@
-namespace HouseReservationApp.Models
+namespace HouseReservation.Web.Models
 {
     public class ErrorViewModel
     {
