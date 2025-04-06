@@ -1,4 +1,4 @@
-﻿namespace HouseReservation.Core.Utilities
+﻿namespace HouseReservation.Contracts.Models
 {
     public enum SortDirection
     {
