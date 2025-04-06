@@ -14,14 +14,8 @@ namespace HouseReservation.Web.Controllers
             if (parameters.Page < 1) parameters = parameters with { Page = 1 };
             if (parameters.PageSize < 1) parameters = parameters with { PageSize = 10 };
 
-            var pagedResult = await _userService.GetPaginatedUsersAsync(parameters);
-
-            ViewData["FirstName"] = parameters.FirstName;
-            ViewData["LastName"] = parameters.LastName;
-            ViewData["SortBy"] = parameters.SortBy;
-            ViewData["SortDirection"] = parameters.SortDirection?.ToString();
-
-            return View(pagedResult);
+            var viewModel = await _userService.GetUserIndexViewModelAsync(parameters);
+            return View(viewModel);
         }
 
         public IActionResult Create()
@@ -31,7 +25,7 @@ namespace HouseReservation.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FirstName,LastName,BankAccount,Phone,Email,Password,ConfirmPassword")] UserCreateViewModel viewModel)
+        public async Task<IActionResult> Create(UserCreateViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
@@ -58,17 +52,16 @@ namespace HouseReservation.Web.Controllers
         {
             var viewModel = await _userService.GetUserEditViewModelAsync(id);
             if (viewModel == null) return NotFound();
-            ViewData["UserId"] = id;
             return View(viewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("FirstName,LastName,BankAccount,Phone")] UserEditViewModel viewModel)
+        public async Task<IActionResult> Edit(UserEditViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
-                var result = await _userService.UpdateUserAsync(id, viewModel);
+                var result = await _userService.UpdateUserAsync(viewModel);
                 if (!result.Succeeded)
                 {
                     foreach (var error in result.Errors)
@@ -84,7 +77,7 @@ namespace HouseReservation.Web.Controllers
                     return RedirectToAction(nameof(Index));
                 }
             }
-            ViewData["UserId"] = id;
+
             return View(viewModel);
         }
 
