@@ -6,6 +6,9 @@ namespace HouseReservation.Contracts.Models.ViewModels
     public class UserEditViewModel
     {
         [Required]
+        public int Id { get; set; }
+
+        [Required]
         [StringLength(100)]
         [DisplayName("First Name")]
         public string FirstName { get; set; }

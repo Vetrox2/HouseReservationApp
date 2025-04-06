@@ -1,15 +1,16 @@
-﻿@using HouseReservation.Core.Utilities
-@using HouseReservation.Core.Models
-@model PagedResult<User>
+﻿@using HouseReservation.Contracts.Models
+@using HouseReservation.Contracts.Models.ViewModels
+@using HouseReservation.Core.Utilities
+@model UserIndexViewModel
 
 @{
     var baseParams = new UserIndexParams(
-        FirstName: ViewData["FirstName"]?.ToString(),
-        LastName: ViewData["LastName"]?.ToString(),
-        Page: Model.CurrentPage,
-        PageSize: Model.PageSize,
-        SortBy: ViewData["SortBy"]?.ToString(),
-        SortDirection: ViewData["SortDirection"]?.ToString() == "Ascending" ? SortDirection.Ascending : ViewData["SortDirection"]?.ToString() == "Descending" ? SortDirection.Descending : null
+        FirstName: Model.FirstNameFilter,
+        LastName: Model.LastNameFilter,
+        Page: Model.PagedResult.CurrentPage,
+        PageSize: Model.PagedResult.PageSize,
+        SortBy: Model.SortBy,
+        SortDirection: Model.SortDirection
     );
 
     var columns = new[]
@@ -31,20 +32,20 @@
     <div class="row">
         <div class="col-md-4">
             <label for="firstName">First Name</label>
-            <input type="text" name="FirstName" value="@ViewData["FirstName"]" class="form-control" />
+            <input type="text" name="FirstName" id="firstName" value="@Model.FirstNameFilter" class="form-control" />
         </div>
         <div class="col-md-4">
             <label for="lastName">Last Name</label>
-            <input type="text" name="LastName" value="@ViewData["LastName"]" class="form-control" />
+            <input type="text" name="LastName" id="lastName" value="@Model.LastNameFilter" class="form-control" />
         </div>
         <div class="col-md-4 d-flex align-items-end">
             <button type="submit" class="btn btn-primary">Filter</button>
         </div>
     </div>
     <input type="hidden" name="Page" value="1" />
-    <input type="hidden" name="PageSize" value="@Model.PageSize" />
-    <input type="hidden" name="SortBy" value="@ViewData["SortBy"]" />
-    <input type="hidden" name="SortDirection" value="@ViewData["SortDirection"]" />
+    <input type="hidden" name="PageSize" value="@Model.PagedResult.PageSize" />
+    <input type="hidden" name="SortBy" value="@Model.SortBy" />
+    <input type="hidden" name="SortDirection" value="@Model.SortDirection" />
 </form>
 
 <table class="table table-hover table-striped">
@@ -58,15 +59,15 @@
                 {
                     Page = 1,
                     SortBy = column.Name,
-                    SortDirection = ViewData["SortBy"]?.ToString() == column.Name && ViewData["SortDirection"]?.ToString() == "Ascending" ? SortDirection.Descending : SortDirection.Ascending
+                    SortDirection = Model.SortBy == column.Name && Model.SortDirection == SortDirection.Ascending ? SortDirection.Descending : SortDirection.Ascending
                 };
                 
                 <th scope="col">
                     <a href="@Url.Action("Index", sortParams)">
                         @column.Display
-                        @if (ViewData["SortBy"]?.ToString() == column.Name)
+                        @if (Model.SortBy == column.Name)
                         {
-                            <span>@(ViewData["SortDirection"]?.ToString() == "asc" ? "↑" : "↓")</span>
+                            <span>@(Model.SortDirectionIcon)</span>
                         }
                     </a>
                 </th>
@@ -75,7 +76,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var user in Model.Items)
+        @foreach (var user in Model.PagedResult.Items)
         {
             <tr>
                 <td class="align-middle">@user.Id</td>
@@ -101,17 +102,17 @@
 </table>
 
 <div class="d-flex flex-column align-items-center mt-4">
-    <p>Showing @(Model.Items.Count()) of @Model.TotalCount users (Page @Model.CurrentPage of @Model.TotalPages)</p>
+    <p>Showing @(Model.PagedResult.Items.Count()) of @Model.PagedResult.TotalCount users (Page @Model.PagedResult.CurrentPage of @Model.PagedResult.TotalPages)</p>
 
     <nav aria-label="User pagination">
         <ul class="pagination justify-content-center">
             <!-- Previous Button -->
-            <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+            <li class="page-item @(Model.PagedResult.CurrentPage == 1 ? "disabled" : "")">
                 @{
-                    var prevParams =baseParams with { Page = Model.CurrentPage - 1 } ;
+                    var prevParams = baseParams with { Page = Model.PagedResult.CurrentPage - 1 };
                 }
                 <a class="page-link"
-                   href="@(Model.CurrentPage > 1 ? Url.Action("Index", prevParams) : "#")"
+                   href="@(Model.PagedResult.CurrentPage > 1 ? Url.Action("Index", prevParams) : "#")"
                    aria-label="Previous">
                     <span aria-hidden="true">«</span>
                 </a>
@@ -119,8 +120,8 @@
 
             <!-- Page Numbers -->
             @{
-                int startPage = Math.Max(1, Model.CurrentPage - 2);
-                int endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+                int startPage = Math.Max(1, Model.PagedResult.CurrentPage - 2);
+                int endPage = Math.Min(Model.PagedResult.TotalPages, Model.PagedResult.CurrentPage + 2);
 
                 if (startPage > 1)
                 {
@@ -137,32 +138,32 @@
                 for (int i = startPage; i <= endPage; i++)
                 {
                     var pageParams = baseParams with { Page = i };
-                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <li class="page-item @(i == Model.PagedResult.CurrentPage ? "active" : "")">
                         <a class="page-link" href="@Url.Action("Index", pageParams)">@i</a>
                     </li>
                 }
 
-                if (endPage < Model.TotalPages)
+                if (endPage < Model.PagedResult.TotalPages)
                 {
-                    if (endPage < Model.TotalPages - 1)
+                    if (endPage < Model.PagedResult.TotalPages - 1)
                     {
                         <li class="page-item disabled"><span class="page-link">...</span></li>
                     }
 
-                    var lastPageParams = baseParams with { Page = Model.TotalPages };
+                    var lastPageParams = baseParams with { Page = Model.PagedResult.TotalPages };
                     <li class="page-item">
-                        <a class="page-link" href="@Url.Action("Index", lastPageParams)">@Model.TotalPages</a>
+                        <a class="page-link" href="@Url.Action("Index", lastPageParams)">@Model.PagedResult.TotalPages</a>
                     </li>
                 }
             }
 
             <!-- Next Button -->
-            <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+            <li class="page-item @(Model.PagedResult.CurrentPage == Model.PagedResult.TotalPages ? "disabled" : "")">
                 @{
-                    var nextParams = baseParams with { Page = Model.CurrentPage + 1 };
+                    var nextParams = baseParams with { Page = Model.PagedResult.CurrentPage + 1 };
                 }
                 <a class="page-link"
-                   href="@(Model.CurrentPage < Model.TotalPages ? Url.Action("Index", nextParams) : "#")"
+                   href="@(Model.PagedResult.CurrentPage < Model.PagedResult.TotalPages ? Url.Action("Index", nextParams) : "#")"
                    aria-label="Next">
                     <span aria-hidden="true">»</span>
                 </a>

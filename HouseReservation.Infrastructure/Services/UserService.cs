@@ -1,8 +1,10 @@
-﻿using HouseReservation.Contracts.Models.ViewModels;
+﻿using HouseReservation.Contracts.Models;
+using HouseReservation.Contracts.Models.ViewModels;
 using HouseReservation.Core.Models;
 using HouseReservation.Core.Services.Interfaces;
 using HouseReservation.Core.Utilities;
 using HouseReservation.Infrastructure.Repositories;
+using HouseReservation.Mappers;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -33,13 +35,7 @@ namespace HouseReservation.Infrastructure.Services
             var user = await _repository.GetByIdAsync(id);
             if (user == null) return null;
 
-            return new UserEditViewModel
-            {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                BankAccount = user.BankAccount,
-                Phone = user.Phone
-            };
+            return user.ToUserEditViewModel();
         }
 
         public async Task<User?> GetUserByEmailAsync(string email)
@@ -58,40 +54,29 @@ namespace HouseReservation.Infrastructure.Services
             if (result.Errors.Count != 0)
                 return result;
 
-            var user = new User
-            {
-                FirstName = viewModel.FirstName,
-                LastName = viewModel.LastName,
-                BankAccount = viewModel.BankAccount,
-                Phone = viewModel.Phone,
-                Email = viewModel.Email,
-                PasswordHash = HashService.HashPassword(viewModel.Password)
-            };
+            var user = viewModel.ToUser(HashService.HashPassword(viewModel.Password));
             await _repository.AddAsync(user);
 
             result.Succeeded = true;
             return result;
         }
 
-        public async Task<ServiceResult> UpdateUserAsync(int id, UserEditViewModel viewModel)
+        public async Task<ServiceResult> UpdateUserAsync(UserEditViewModel viewModel)
         {
             var result = new ServiceResult();
-            var existingUser = await _repository.GetByIdAsync(id);
+            var existingUser = await _repository.GetByIdAsync(viewModel.Id);
 
             if (existingUser == null)
             {
                 result.Errors.Add("", ["User not found."]);
                 return result;
             }
-            if (await _repository.ExistsAsync(u => u.BankAccount == viewModel.BankAccount && u.Id != id))
+            if (await _repository.ExistsAsync(u => u.BankAccount == viewModel.BankAccount && u.Id != viewModel.Id))
                 result.Errors.Add("BankAccount", ["Bank account is already taken."]);
             if (result.Errors.Count != 0)
                 return result;
 
-            existingUser.FirstName = viewModel.FirstName;
-            existingUser.LastName = viewModel.LastName;
-            existingUser.BankAccount = viewModel.BankAccount;
-            existingUser.Phone = viewModel.Phone;
+            existingUser.UpdateFrom(viewModel);
             await _repository.UpdateAsync(existingUser);
 
             result.Succeeded = true;
@@ -103,7 +88,22 @@ namespace HouseReservation.Infrastructure.Services
             return await _repository.DeleteAsync(id);
         }
 
-        public async Task<PagedResult<User>> GetPaginatedUsersAsync(UserIndexParams parameters)
+        public async Task<UserIndexViewModel> GetUserIndexViewModelAsync(UserIndexParams parameters)
+        {
+            var pagedResult = await GetPaginatedUsersAsync(parameters);
+            var viewModel = new UserIndexViewModel
+            {
+                PagedResult = pagedResult,
+                FirstNameFilter = parameters.FirstName,
+                LastNameFilter = parameters.LastName,
+                SortBy = parameters.SortBy,
+                SortDirection = parameters.SortDirection
+            };
+
+            return viewModel;
+        }
+
+        private async Task<PagedResult<UserDto>> GetPaginatedUsersAsync(UserIndexParams parameters)
         {
             var query = _repository.GetAll();
 
@@ -120,7 +120,11 @@ namespace HouseReservation.Infrastructure.Services
                 : query.OrderByDescending(accessor);
             }
 
-            return await _repository.GetPaginatedAsync(parameters.Page, parameters.PageSize, query);
+            var pagedResult = await _repository.GetPaginatedAsync(parameters.Page, parameters.PageSize, query);
+            var userDtos = pagedResult.Items.Select(u => u.ToUserDto());
+            var result = new PagedResult<UserDto>(userDtos, pagedResult.TotalCount, pagedResult.CurrentPage, pagedResult.PageSize);
+
+            return result;
         }
     }
 }
