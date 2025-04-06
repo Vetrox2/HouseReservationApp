@@ -10,8 +10,8 @@ namespace HouseReservation.Core.Services.Interfaces
         Task<UserEditViewModel?> GetUserEditViewModelAsync(int id);
         Task<User?> GetUserByEmailAsync(string email);
         Task<ServiceResult> CreateUserAsync(UserCreateViewModel viewModel);
-        Task<ServiceResult> UpdateUserAsync(int id, UserEditViewModel viewModel);
+        Task<ServiceResult> UpdateUserAsync(UserEditViewModel viewModel);
         Task<bool> DeleteUserAsync(int id);
-        Task<PagedResult<User>> GetPaginatedUsersAsync(UserIndexParams parameters);
+        Task<UserIndexViewModel> GetUserIndexViewModelAsync(UserIndexParams parameters);
     }
 }
