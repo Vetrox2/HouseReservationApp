@@ -1,4 +1,6 @@
-﻿namespace HouseReservation.Core.Utilities
+﻿using HouseReservation.Contracts.Models;
+
+namespace HouseReservation.Core.Utilities
 {
     public record UserIndexParams(
         string? FirstName = null,

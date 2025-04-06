@@ -1,5 +1,5 @@
-﻿using HouseReservation.Core.Models.Interfaces;
-using HouseReservation.Core.Utilities;
+﻿using HouseReservation.Contracts.Models;
+using HouseReservation.Core.Models.Interfaces;
 using HouseReservation.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
