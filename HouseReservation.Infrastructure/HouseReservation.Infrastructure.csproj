@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Contracts\HouseReservation.Contracts.csproj" />
     <ProjectReference Include="..\HouseReservation.Core\HouseReservation.Core.csproj" />
+    <ProjectReference Include="..\HouseReservation.Mappers\HouseReservation.Mappers.csproj" />
   </ItemGroup>
 
 </Project>
