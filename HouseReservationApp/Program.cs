@@ -1,3 +1,6 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using HouseReservation.Contracts.Validators;
 using HouseReservation.Core.Services.Interfaces;
 using HouseReservation.Infrastructure.Data;
 using HouseReservation.Infrastructure.Repositories;
@@ -15,6 +18,9 @@ builder.Services.AddDbContext<HouseReservationContext>(options =>
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddValidatorsFromAssembly(typeof(UserCreateViewModelValidator).Assembly);
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
 
 var app = builder.Build();
 
