@@ -11,6 +11,7 @@ A simple ASP.NET Core MVC application for house reservations, built with Entity 
 - **Bootstrap Icons**
 - **Authentication System** (Basic User Login/Register)
 - **BCrypt** (for password hashing)
+- **FluentValidation**
 
 
 ## 🔹 Features
