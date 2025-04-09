@@ -13,12 +13,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<HouseReservationContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Laptop")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserService, UserService>();
 
-builder.Services.AddValidatorsFromAssemblyContaining<UserCreateViewModelValidator>();
+builder.Services.AddValidatorsFromAssembly(typeof(UserCreateViewModelValidator).Assembly);
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 
 var app = builder.Build();
