@@ -10,7 +10,6 @@ namespace HouseReservation.Contracts.Validators
 {
     public class UserCreateViewModelValidator : AbstractValidator<UserCreateViewModel>
     {
-        //dodaj validacje dla email z bazy i email
         public UserCreateViewModelValidator()
         {
             RuleFor(x => x.FirstName)
