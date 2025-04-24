@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Mapster" Version="7.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Contracts\HouseReservation.Contracts.csproj" />
     <ProjectReference Include="..\HouseReservation.Core\HouseReservation.Core.csproj" />
   </ItemGroup>
