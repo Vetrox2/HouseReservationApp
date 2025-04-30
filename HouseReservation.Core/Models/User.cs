@@ -1,13 +1,14 @@
 ﻿using HouseReservation.Core.Models.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace HouseReservation.Core.Models
 {
-    public class User : IEntity
+    public class User : IdentityUser<int>, IEntity
     {
         [Key]
-        public int Id { get; set; }
+        public override int Id { get; set; }
 
         [Required]
         [StringLength(100)]
@@ -23,7 +24,7 @@ namespace HouseReservation.Core.Models
         [EmailAddress]
         [StringLength(255)]
         [DisplayName("Email")]
-        public string Email { get; set; }
+        public override string Email { get; set; }
 
         [Required]
         [Phone]
@@ -38,7 +39,7 @@ namespace HouseReservation.Core.Models
 
         [Required]
         [DisplayName("Password")]
-        public string PasswordHash { get; set; }
+        public override string PasswordHash { get; set; }
 
         [Required]
         [DisplayName("Created at")]
