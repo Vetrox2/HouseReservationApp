@@ -1,10 +1,12 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using HouseReservation.Contracts.Validators;
+using HouseReservation.Core.Models;
 using HouseReservation.Core.Services.Interfaces;
 using HouseReservation.Infrastructure.Data;
 using HouseReservation.Infrastructure.Repositories;
 using HouseReservation.Infrastructure.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +15,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<HouseReservationContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("HouseReservation.Infrastructure"));
+});
+
+builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = true;
+})
+    .AddEntityFrameworkStores<HouseReservationContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserService, UserService>();
