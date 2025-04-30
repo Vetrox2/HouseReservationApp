@@ -1,11 +1,12 @@
 ﻿using HouseReservation.Core.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HouseReservation.Infrastructure.Data
 {
-    public class HouseReservationContext(DbContextOptions<HouseReservationContext> options) : DbContext(options)
+    public class HouseReservationContext(DbContextOptions<HouseReservationContext> options) : IdentityDbContext<User, IdentityRole<int>, int>(options)
     {
-        public DbSet<User> Users { get; set; }
         public DbSet<House> Houses { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
 
