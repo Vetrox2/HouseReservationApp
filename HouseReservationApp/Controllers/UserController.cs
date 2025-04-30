@@ -1,14 +1,17 @@
 ﻿using HouseReservation.Contracts.Models.ViewModels;
 using HouseReservation.Core.Services.Interfaces;
 using HouseReservation.Core.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HouseReservation.Web.Controllers
 {
+    [Authorize]
     public class UserController(IUserService userService) : Controller
     {
         private readonly IUserService _userService = userService;
 
+        [AllowAnonymous]
         public async Task<IActionResult> Index(UserIndexParams parameters)
         {
             if (parameters.Page < 1) parameters = parameters with { Page = 1 };
