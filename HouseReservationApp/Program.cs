@@ -23,10 +23,18 @@ builder.Services.AddDbContext<HouseReservationContext>(options =>
 
 builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
 {
-    options.SignIn.RequireConfirmedAccount = true;
+    //options.SignIn.RequireConfirmedAccount = true;
 })
     .AddEntityFrameworkStores<HouseReservationContext>()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders()
+    .AddRoles<IdentityRole<int>>();
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("AdminOrManager", policy =>
+        policy.RequireRole("Admin", "Manager"))
+    .AddPolicy("AtLeastUser", policy =>
+        policy.RequireRole("User", "Admin", "Manager"));
+
 
 builder.Services.AddTransient<IEmailSender, NoOpEmailSender>();
 
@@ -39,11 +47,12 @@ builder.Services.AddFluentValidationClientsideAdapters();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+using var scope = app.Services.CreateScope();
+await IdentityDataSeeder.SeedAsync(scope.ServiceProvider);
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

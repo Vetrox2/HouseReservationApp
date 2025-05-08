@@ -6,12 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HouseReservation.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "AtLeastUser")]
     public class UserController(IUserService userService) : Controller
     {
         private readonly IUserService _userService = userService;
 
-        [AllowAnonymous]
         public async Task<IActionResult> Index(UserIndexParams parameters)
         {
             if (parameters.Page < 1) parameters = parameters with { Page = 1 };
@@ -21,6 +20,7 @@ namespace HouseReservation.Web.Controllers
             return View(viewModel);
         }
 
+        [Authorize(Policy = "AdminOrManager")]
         public IActionResult Create()
         {
             return View();
@@ -28,6 +28,7 @@ namespace HouseReservation.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "AdminOrManager")]
         public async Task<IActionResult> Create(UserCreateViewModel viewModel)
         {
             if (ModelState.IsValid)
@@ -51,6 +52,7 @@ namespace HouseReservation.Web.Controllers
             return View(viewModel);
         }
 
+        [Authorize(Policy = "AdminOrManager")]
         public async Task<IActionResult> Edit(int id)
         {
             var viewModel = await _userService.GetUserEditViewModelAsync(id);
@@ -60,6 +62,7 @@ namespace HouseReservation.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "AdminOrManager")]
         public async Task<IActionResult> Edit(UserEditViewModel viewModel)
         {
             if (ModelState.IsValid)
@@ -86,6 +89,7 @@ namespace HouseReservation.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
             => await _userService.DeleteUserAsync(id) ? RedirectToAction("Index") : NotFound();
 
