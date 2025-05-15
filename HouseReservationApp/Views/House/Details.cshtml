@@ -1,0 +1,130 @@
+﻿@using HouseReservation.Contracts.Models.ViewModels
+@using HouseReservation.Core.Models
+@using Microsoft.AspNetCore.Identity
+@model HouseReservationViewModel
+@inject SignInManager<User> SignInManager
+
+@{
+	var existing = ViewData["ExistingReservations"]
+							as IEnumerable<Reservation>
+							?? Enumerable.Empty<Reservation>();
+}
+
+<div class="row">
+	<div class="col-md-6">
+		<img src="@Model.House.ImageUrl"
+		class="img-fluid rounded house-img" />
+	</div>
+	<div class="col-md-6">
+		<h1>@Model.House.Title</h1>
+		<p>@Model.House.Description</p>
+		<ul>
+			<li>Price: @Model.House.PricePerNight.ToString("C")</li>
+			<li>Size: @Model.House.SizeM2 m²</li>
+			<li>Bedrooms: @Model.House.Bedrooms</li>
+			<li>Bathrooms: @Model.House.Bathrooms</li>
+			<li>Address: @Model.House.Address</li>
+		</ul>
+	</div>
+</div>
+
+
+<hr />
+
+<h4>Existing Reservations</h4>
+@if (!existing.Any())
+{
+	<p>No reservations.</p>
+}
+else
+{
+	<ul class="list-group mb-4">
+		@{
+			var sortedReservations = existing.OrderBy(r => r.CheckInDate);
+		}
+		@foreach (var r in sortedReservations)
+		{
+			<li class="list-group-item">
+				@r.CheckInDate.ToString("dd.MM.yyyy") → @r.CheckOutDate.ToString("dd.MM.yyyy")
+			</li>
+		}
+	</ul>
+}
+@if (!SignInManager.IsSignedIn(User))
+{
+	<div class="alert alert-warning">
+		Please <a asp-area="Identity" asp-page="/Account/Login">log in</a> to make a reservation.
+	</div>
+}
+else
+{
+	<form asp-action="Reserve" method="post" class="row g-3">
+		@Html.AntiForgeryToken()
+
+		<input asp-for="Reservation.HouseId" type="hidden" />
+		
+		<div class="col-md-4">
+			<label asp-for="Reservation.CheckInDate" class="form-label">Check-in</label>
+			<input name="Reservation.CheckInDate" type="date" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+
+			<span asp-validation-for="Reservation.CheckInDate" class="text-danger"></span>
+		</div>
+		<div class="col-md-4">
+			<label asp-for="Reservation.CheckOutDate" class="form-label">Check-out</label>
+			<input name="Reservation.CheckOutDate" type="date" class="form-control" value="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+			<span asp-validation-for="Reservation.CheckOutDate" class="text-danger"></span>
+		</div>
+
+		<div class="col-md-4">
+			<label class="form-label">Total Price</label>
+			<p id="totalPrice" class="fw-bold">-</p>
+		</div>
+
+
+		@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+		<div class="col-12">
+			<button type="submit" class="btn btn-success">Reserve</button>
+		</div>
+	</form>
+}
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			const checkInInput = document.querySelector('input[name="Reservation.CheckInDate"]');
+			const checkOutInput = document.querySelector('input[name="Reservation.CheckOutDate"]');
+			const priceElement = document.getElementById('totalPrice');
+			const pricePerNight = @Model.House.PricePerNight.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+			function updatePrice() {
+				const checkIn = new Date(checkInInput.value);
+				const checkOut = new Date(checkOutInput.value);
+
+				if (!isNaN(checkIn) && !isNaN(checkOut) && checkOut > checkIn) {
+					const days = (checkOut - checkIn) / (1000 * 60 * 60 * 24);
+					const total = days * parseFloat(pricePerNight);
+					priceElement.textContent = total.toLocaleString(undefined, { style: 'currency', currency: 'PLN' });
+				} else {
+					priceElement.textContent = '-';
+				}
+			}
+
+			checkInInput.addEventListener('change', updatePrice);
+			checkOutInput.addEventListener('change', updatePrice);
+
+			updatePrice();
+		});
+	</script>
+}
+
+
+
+<style>
+	.house-img {
+		width: 100%;
+		height: 300px;
+		object-fit: cover;
+	}
+</style>
