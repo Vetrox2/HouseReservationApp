@@ -1,8 +1,217 @@
-﻿@{
+﻿@using HouseReservation.Contracts.Models.ViewModels
+@{
     ViewData["Title"] = "Home";
 }
+@{
+    var baseParams = new HouseFilterViewModel
+            {
+                City = Model.Filter.City,
+                CheckIn = Model.Filter.CheckIn,
+                CheckOut = Model.Filter.CheckOut,
+                MinPrice = Model.Filter.MinPrice,
+                MaxPrice = Model.Filter.MaxPrice,
+                Bedrooms = Model.Filter.Bedrooms,
+                Bathrooms = Model.Filter.Bathrooms,
+                SortBy = Model.Filter.SortBy,
+                SortDesc = Model.Filter.SortDesc,
+                PageSize = Model.PagedHouses.PageSize
+            };
+}
+@model HouseListViewModel
+<form asp-action="Index" method="get" class="border rounded p-4 mb-4 shadow-sm bg-light">
+    <div class="row gy-3">
+        <!-- Miasto -->
+        <div class="col-md-4">
+            <label asp-for="Filter.City" class="form-label">City</label>
+            <input asp-for="Filter.City" class="form-control" placeholder="Enter city..." />
+        </div>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+        <!-- Daty -->
+        <div class="col-md-4">
+            <label asp-for="Filter.CheckIn" class="form-label">Check-in</label>
+            <input asp-for="Filter.CheckIn" type="date" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Filter.CheckOut" class="form-label">Check-out</label>
+            <input asp-for="Filter.CheckOut" type="date" class="form-control" />
+        </div>
+
+        <!-- Cena -->
+        <div class="col-md-6">
+            <label class="form-label">Price range</label>
+            <div class="input-group">
+                <span class="input-group-text">Min</span>
+                <input asp-for="Filter.MinPrice" type="number" step="0.01" class="form-control" />
+                <span class="input-group-text">Max</span>
+                <input asp-for="Filter.MaxPrice" type="number" step="0.01" class="form-control" />
+            </div>
+        </div>
+
+        <!-- Pokoje i łazienki -->
+        <div class="col-md-3">
+            <label asp-for="Filter.Bedrooms" class="form-label">Bedrooms</label>
+            <select asp-for="Filter.Bedrooms" class="form-select">
+                <option value="">Any</option>
+                @for (int i = 1; i <= 6; i++)
+                {
+                    <option value="@i">@i+</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="Filter.Bathrooms" class="form-label">Bathrooms</label>
+            <select asp-for="Filter.Bathrooms" class="form-select">
+                <option value="">Any</option>
+                @for (int i = 1; i <= 5; i++)
+                {
+                    <option value="@i">@i+</option>
+                }
+            </select>
+        </div>
+
+        <!-- Sortowanie -->
+        <div class="col-md-6">
+            <label asp-for="Filter.SortBy" class="form-label">Sort by</label>
+            <select asp-for="Filter.SortBy" class="form-select">
+                <option value="">Default</option>
+                <option value="PricePerNight">Price</option>
+                <option value="CreatedAt">Date added</option>
+                <option value="SizeM2">Size</option>
+            </select>
+        </div>
+        <div class="col-md-6 d-flex align-items-end">
+            <div class="form-check mt-2">
+                <input asp-for="Filter.SortDesc" class="form-check-input" />
+                <label asp-for="Filter.SortDesc" class="form-check-label">Descending</label>
+            </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="col-12 text-end mt-3">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </div>
+</form>
+
+<div class="row">
+    @foreach (var h in Model.PagedHouses.Items)
+    {
+        <div class="col-md-4 mb-4">
+            <a asp-controller="House" asp-action="Details" asp-route-id="@h.Id" class="house-card">
+                <div class="card">
+                    <img src="@h.ImageUrl" class="card-img-top" />
+                    <div class="card-body">
+                        <h5>@h.Title</h5>
+                        <p>@h.City</p>
+                        <p>@h.PricePerNight.ToString("C") per night</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    }
 </div>
+<!-- paginacja podobna do twojej -->
+<div class="d-flex flex-column align-items-center mt-4">
+    <p>
+        Showing @Model.PagedHouses.Items.Count() of @Model.PagedHouses.TotalCount
+        (Page @Model.PagedHouses.CurrentPage of @Model.PagedHouses.TotalPages)
+    </p>
+
+    <nav aria-label="House pagination">
+        <ul class="pagination justify-content-center">
+            @* Previous *@
+            <li class="page-item @(Model.PagedHouses.CurrentPage == 1 ? "disabled" : "")">
+                @{
+                    var prev = baseParams with { Page = Model.PagedHouses.CurrentPage - 1 };
+                }
+                <a class="page-link"
+                   href="@(Model.PagedHouses.CurrentPage > 1
+                       ? Url.Action("Index", prev)
+                       : "#")" aria-label="Previous">
+                    <span aria-hidden="true">«</span>
+                </a>
+            </li>
+
+            @* Page numbers *@
+            @{
+                var start = Math.Max(1, Model.PagedHouses.CurrentPage - 2);
+                var end = Math.Min(Model.PagedHouses.TotalPages, Model.PagedHouses.CurrentPage + 2);
+            }
+
+            @if (start > 1)
+            {
+                var first = baseParams with { Page = 1 };
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", first)">1</a>
+                </li>
+                @if (start > 2)
+                {
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                }
+            }
+
+            @for (int i = start; i <= end; i++)
+            {
+                var p = baseParams with { Page = i };
+                <li class="page-item @(i == Model.PagedHouses.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", p)">@i</a>
+                </li>
+            }
+
+            @if (end < Model.PagedHouses.TotalPages)
+            {
+                @if (end < Model.PagedHouses.TotalPages - 1)
+                {
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                }
+                var last = baseParams with { Page = Model.PagedHouses.TotalPages };
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", last)">
+                        @Model.PagedHouses.TotalPages
+                    </a>
+                </li>
+            }
+
+            @* Next *@
+            <li class="page-item @(Model.PagedHouses.CurrentPage == Model.PagedHouses.TotalPages ? "disabled" : "")">
+                @{
+                    var next = baseParams with { Page = Model.PagedHouses.CurrentPage + 1 };
+                }
+                <a class="page-link"
+                   href="@(Model.PagedHouses.CurrentPage < Model.PagedHouses.TotalPages
+                       ? Url.Action("Index", next)
+                       : "#")" aria-label="Next">
+                    <span aria-hidden="true">»</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<style>
+    .house-card {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .house-card:hover {
+        transform: scale(1.05);
+        cursor: pointer;
+    }
+
+    .house-card .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .house-card .card {
+        height: 100%;
+    }
+
+    .card-body h5 {
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+</style>
