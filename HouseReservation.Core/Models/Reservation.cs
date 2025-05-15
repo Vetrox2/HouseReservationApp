@@ -13,22 +13,7 @@ namespace HouseReservation.Core.Models
         public int HouseId { get; set; }
 
         [Required]
-        [StringLength(100)]
-        public string FirstName { get; set; }
-
-        [Required]
-        [StringLength(100)]
-        public string LastName { get; set; }
-
-        [Required]
-        [EmailAddress]
-        [StringLength(255)]
-        public string Email { get; set; }
-
-        [Required]
-        [Phone]
-        [StringLength(20)]
-        public string Phone { get; set; }
+        public int UserId { get; set; }
 
         [Required]
         public DateTime CheckInDate { get; set; }
@@ -44,5 +29,8 @@ namespace HouseReservation.Core.Models
 
         [ForeignKey("HouseId")]
         public House House { get; set; }
+
+        [ForeignKey("UserId")]
+        public User User { get; set; }
     }
 }

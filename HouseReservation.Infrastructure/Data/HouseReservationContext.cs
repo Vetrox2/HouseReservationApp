@@ -33,6 +33,12 @@ namespace HouseReservation.Infrastructure.Data
                 .WithOne(r => r.House)
                 .HasForeignKey(r => r.HouseId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<User>()
+               .HasMany(u => u.Reservations)
+               .WithOne(r => r.User)
+               .HasForeignKey(r => r.UserId)
+               .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
