@@ -40,6 +40,8 @@ builder.Services.AddTransient<IEmailSender, NoOpEmailSender>();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddScoped<IHouseService, HouseService>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(UserCreateViewModelValidator).Assembly);
 builder.Services.AddFluentValidationAutoValidation();
@@ -71,7 +73,6 @@ app.MapAreaControllerRoute(
     areaName: "Admin",
     pattern: "Admin/{controller=Dashboard}/{action=Index}/{id?}"
 );
-
 
 app.MapControllerRoute(
     name: "default",
