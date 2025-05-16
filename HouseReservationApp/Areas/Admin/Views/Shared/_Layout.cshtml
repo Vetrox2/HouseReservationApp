@@ -9,6 +9,25 @@
     <link rel="stylesheet" href="~/HouseReservationApp.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
     <link href="~/css/sb-admin-2-custom.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body id="page-top">
     <div id="wrapper">
@@ -25,8 +44,18 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Earnings">
+                    <i class="fas fa-fw fa-tachometer-alt"></i><span>Earnings</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" asp-area="Admin" asp-controller="User" asp-action="Index">
                     <i class="fas fa-fw fa-users"></i><span>Użytkownicy</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-fw fa-users"></i><span>Back to app</span>
                 </a>
             </li>
         </ul>
@@ -45,7 +74,7 @@
                         </div>
                     </form>
                 </nav>
-                <div class="container-fluid">
+                <div class="main-content container-fluid">
                     @RenderBody()
                     @RenderSection("Scripts", required: false)
                 </div>
