@@ -1,0 +1,109 @@
+﻿@model EarningsReportViewModel
+@using System.Globalization
+@using HouseReservation.Contracts.Models.ViewModels
+
+@{
+    ViewData["Title"] = "Earnings Report";
+    // Prepare JSON arrays for Chart.js
+    var labels = Model.Months.Select(m => $"{m.MonthName} {m.Year}").ToArray();
+    var sure = Model.Months.Select(m => m.SureEarnings).ToArray();
+    var possible = Model.Months.Select(m => m.PossibleEarnings).ToArray();
+}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex align-items-center">
+        <h6 class="m-0 mr-3 font-weight-bold text-primary">Earnings Report</h6>
+        <form asp-action="Earnings" method="get" class="ms-auto d-flex align-items-center">
+            <label class="me-2 mb-0 mr-2">From:</label>
+            <input name="from" type="month"
+                   value="@(Model.Months.FirstOrDefault() is var f && f != null
+                       ? $"{f.Year:D4}-{f.Month:D2}" : DateTime.Today.ToString("yyyy-MM"))"
+                   class="form-control form-control-sm me-3 mr-3" />
+            <label class="me-2 mb-0 mr-2">To:</label>
+            <input name="to" type="month"
+                   value="@(Model.Months.LastOrDefault() is var l && l != null
+                       ? $"{l.Year:D4}-{l.Month:D2}" : DateTime.Today.ToString("yyyy-MM"))"
+                   class="form-control form-control-sm me-3 mr-3" />
+            <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+        </form>
+    </div>
+    <div class="card-body">
+        <canvas id="earningsChart"></canvas>
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Month</th>
+            <th>Sure Earnings</th>
+            <th>Possible Earnings</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var m in Model.Months)
+        {
+            <tr>
+                <td>@m.MonthName @m.Year</td>
+                <td>@m.SureEarnings.ToString("C")</td>
+                <td>@m.PossibleEarnings.ToString("C")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+    <script>
+        const ctx = document.getElementById('earningsChart').getContext('2d');
+        const labels       = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(labels));
+        const sureData     = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(sure));
+        const possibleData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(possible));
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Sure Earnings',
+                        data: sureData,
+                        backgroundColor: 'rgba(78, 115, 223, 0.7)' // SB Admin 2 primary
+                    },
+                    {
+                        label: 'Possible Earnings',
+                        data: possibleData,
+                        backgroundColor: 'rgba(28, 200, 138, 0.7)' // SB Admin 2 success
+                    }
+                ]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { maxRotation: 0 }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value =>
+                                new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(value)
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: { boxWidth: 12 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => {
+                                const v = ctx.raw;
+                                return ctx.dataset.label + ': ' +
+                                    new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(v);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>

@@ -7,36 +7,33 @@ namespace HouseReservation.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Policy = "AdminOrManager")]
-    public class DashboardController : Controller
+    public class DashboardController(IUserService userService, IHouseService houseService, IReservationService reservationService) : Controller
     {
-        private readonly IUserService _userService;
-        //private readonly IHouseService _houseService;
-        //private readonly IReservationService _reservationService;
-
-        public DashboardController(
-            IUserService userService)
-            //IHouseService houseService,
-            //IReservationService reservationService)
-        {
-            _userService = userService;
-            //_houseService = houseService;
-            //_reservationService = reservationService;
-        }
 
         public async Task<IActionResult> Index()
         {
-            var userCount = (await _userService.GetAllUsersAsync()).Count();
-            var houseCount = 0;//await _houseService.GetTotalHousesAsync();
-            var totalMargin = 0;//await _reservationService.GetTotalMarginAsync();
+            var userCount = (await userService.GetAllUsersAsync()).Count();
+            var houseCount = await houseService.GetTotalHousesAsync();
+            var earningsReport = await reservationService.GetEarningsReportAsync(DateTime.Today);
+            var sureEarnings = earningsReport.Months.Sum(x => x.SureEarnings);
+            var possibleEarnings = earningsReport.Months.Sum(x => x.PossibleEarnings);
 
             var vm = new DashboardViewModel
             {
                 UserCount = userCount,
                 HouseCount = houseCount,
-                TotalMargin = totalMargin
+                EarningsReport = earningsReport,
+                SureEarnings = sureEarnings,
+                PossibleEarnings = possibleEarnings
             };
 
             return View(vm);
+        }
+
+        public async Task<IActionResult> Earnings(DateTime? from, DateTime? to)
+        {
+            var report = await reservationService.GetEarningsReportAsync(from, to);
+            return View(report);
         }
     }
 }

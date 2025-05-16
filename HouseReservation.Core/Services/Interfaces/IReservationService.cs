@@ -15,5 +15,6 @@ namespace HouseReservation.Core.Services.Interfaces
         Task CancelReservationAsync(int reservationId, int userId);
         Task<IEnumerable<Reservation>> GetReservationsForHouseAsync(int houseId);
         Task<bool> IsOverlappingAsync(int houseId, DateTime ci, DateTime co);
+        Task<EarningsReportViewModel> GetEarningsReportAsync(DateTime? from = null, DateTime? to = null);
     }
 }
