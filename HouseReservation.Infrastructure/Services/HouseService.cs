@@ -161,5 +161,11 @@ namespace HouseReservation.Infrastructure.Services
             var list = _houseRepo.GetAll().Where(h => h.OwnerId == ownerId).AsNoTracking();
             return await list.Select(h => h.Adapt<HouseListItemViewModel>()).ToListAsync();
         }
+
+        public async Task<int> GetTotalHousesAsync()
+        {
+            return await _houseRepo.GetAll().CountAsync();
+        }
+
     }
 }

@@ -17,5 +17,6 @@ namespace HouseReservation.Core.Services.Interfaces
         Task DeleteHouseAsync(int id, int userId);
         Task<IEnumerable<HouseListItemViewModel>> GetMyHousesAsync(int ownerId);
         Task<HouseEditViewModel?> GetHouseEditViewModelAsync(int id);
+        Task<int> GetTotalHousesAsync();
     }
 }
