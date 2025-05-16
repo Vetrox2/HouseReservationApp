@@ -20,7 +20,8 @@ namespace HouseReservation.Web.Controllers
                 House = house,
                 Reservation = new ReservationCreateViewModel
                 {
-                    HouseId = id
+                    HouseId = id,
+                    PricePerNight = house.PricePerNight
                 }
             };
 

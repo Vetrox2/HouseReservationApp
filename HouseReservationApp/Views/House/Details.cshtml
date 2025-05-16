@@ -62,6 +62,7 @@ else
 		@Html.AntiForgeryToken()
 
 		<input asp-for="Reservation.HouseId" type="hidden" />
+		<input asp-for="Reservation.PricePerNight" type="hidden" />
 		
 		<div class="col-md-4">
 			<label asp-for="Reservation.CheckInDate" class="form-label">Check-in</label>
