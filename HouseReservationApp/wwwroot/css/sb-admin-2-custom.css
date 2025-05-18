@@ -1,0 +1,368 @@
+:root {
+    --bg-body: #f0fdf4;
+    --color-body: #064e3b;
+    --bg-sidebar: #10b981;
+    --bg-sidebar-hover: #059669;
+    --bg-topbar: #ffffff;
+    --color-topbar: #065f46;
+    --bg-card: #ffffff;
+    --primary: #10b981;
+    --secondary: #047857;
+    --table-bg: #ecfdf5;
+    --table-border: #a7f3d0;
+    --sidebar-brand-color: #ffffff;
+    --success: #28a745;
+    --success-text: #fff;
+}
+
+body.dark-mode {
+    --bg-body: #121318;
+    --color-body: #e5e7eb;
+    --bg-sidebar: #2f333d;
+    --bg-sidebar-hover: #3e434f;
+    --bg-topbar: #1f2129;
+    --color-topbar: #cbd5e1;
+    --bg-card: #1e202a;
+    --primary: #6b7280;
+    --secondary: #4b5563;
+    --table-bg: #272833;
+    --table-border: #374151;
+    --sidebar-brand-color: #e0e0e0;
+    --success: #298029;
+    --success-text: #e5e7eb;
+}
+
+body {
+    background-color: var(--bg-body);
+    color: var(--color-body);
+}
+
+a {
+    color: var(--primary);
+}
+
+a:hover {
+    color: var(--secondary);
+}
+
+.sidebar {
+    background-color: var(--bg-sidebar) !important;
+}
+
+.sidebar .nav-item .nav-link {
+    color: #f9fafb;
+}
+
+.sidebar .nav-item .nav-link:hover,
+.sidebar .nav-item.active .nav-link {
+    background-color: var(--bg-sidebar-hover) !important;
+}
+
+.sidebar-dark .sidebar-brand-text {
+    color: var(--sidebar-brand-color) !important;
+}
+
+.topbar {
+    background-color: var(--bg-topbar) !important;
+    color: var(--color-topbar);
+}
+
+.topbar .navbar-nav .nav-link {
+    color: var(--color-topbar);
+}
+
+.card {
+    background-color: var(--bg-card);
+    color: inherit;
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    background-color: var(--bg-topbar);
+    border-color: var(--primary);
+}
+
+.btn-primary {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #fff !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--secondary) !important;
+    border-color: var(--secondary) !important;
+}
+
+.btn-secondary {
+    background-color: var(--secondary) !important;
+    border-color: var(--secondary) !important;
+    color: #fff !important;
+}
+
+.btn-outline-primary {
+    color: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary) !important;
+    color: #fff !important;
+}
+
+.table {
+    background-color: var(--bg-card);
+    color: inherit;
+}
+
+.table thead {
+    background-color: var(--primary);
+    color: #fff;
+}
+
+.table thead th {
+    border-color: var(--primary);
+}
+
+.table tbody tr {
+    background-color: var(--table-bg);
+    border-bottom: 1px solid var(--table-border);
+}
+
+.table tbody tr:hover {
+    background-color: var(--sidebar-hover);
+}
+
+.form-control {
+    background-color: var(--bg-card);
+    color: inherit;
+    border: 1px solid var(--table-border);
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.25);
+}
+
+.theme-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.theme-icon {
+    font-size: 1.2rem;
+}
+
+.theme-toggle {
+    width: 50px;
+    height: 26px;
+    background-color: #ccc;
+    border: none;
+    border-radius: 50px;
+    position: relative;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle.active {
+    background-color: #4e73df;
+}
+
+.theme-toggle.active .toggle-slider {
+    transform: translateX(24px);
+}
+
+.sidebar.bg-gradient-primary,
+#accordionSidebar.bg-gradient-primary {
+    background: var(--bg-sidebar) !important;
+}
+
+.sidebar.sidebar-dark .nav-item .nav-link {
+    color: #f9fafb !important;
+}
+
+.sidebar.sidebar-dark .nav-item .nav-link:hover,
+.sidebar.sidebar-dark .nav-item.active .nav-link {
+    background-color: var(--bg-sidebar-hover) !important;
+}
+
+.topbar.bg-white {
+    background-color: var(--bg-topbar) !important;
+    color: var(--color-topbar) !important;
+}
+
+.topbar.bg-white .navbar-nav .nav-link {
+    color: var(--color-topbar) !important;
+}
+
+.card {
+    background-color: var(--bg-card) !important;
+    color: inherit !important;
+}
+
+.table {
+    background-color: var(--bg-card) !important;
+    color: inherit !important;
+}
+
+.table thead {
+    background-color: var(--primary) !important;
+    color: #fff !important;
+}
+
+.table tbody tr {
+    background-color: var(--table-bg) !important;
+    border-bottom: 1px solid var(--table-border) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #fff !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--secondary) !important;
+    border-color: var(--secondary) !important;
+}
+
+body,
+html {
+    background-color: var(--bg-body) !important;
+    color: var(--color-body) !important;
+}
+
+.form-control {
+    background-color: var(--bg-card) !important;
+    color: inherit !important;
+    border: 1px solid var(--table-border) !important;
+}
+
+.form-control:focus {
+    border-color: var(--primary) !important;
+}
+
+a,
+.sidebar a {
+    color: var(--primary) !important;
+}
+
+a:hover,
+.sidebar a:hover {
+    color: var(--secondary) !important;
+}
+
+.bg-white {
+    background-color: var(--bg-body) !important;
+}
+
+#page-top,
+#wrapper,
+#content-wrapper {
+    background-color: var(--bg-body) !important;
+}
+
+.container-fluid,
+.container {
+    background-color: transparent !important;
+}
+
+nav.topbar,
+footer.sticky-footer {
+    background-color: var(--bg-body) !important;
+}
+
+.bg-gradient-primary,
+.sidebar.bg-gradient-primary {
+    background: var(--bg-sidebar) !important;
+}
+
+.pagination .page-link {
+    background-color: var(--bg-card) !important;
+    color: var(--primary) !important;
+    border: 1px solid var(--table-border) !important;
+}
+
+.pagination .page-item.disabled .page-link {
+    background-color: var(--bg-card) !important;
+    color: var(--table-border) !important;
+    pointer-events: none;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary) !important;
+    color: #fff !important;
+    border-color: var(--primary) !important;
+}
+
+.pagination .page-link:hover {
+    background-color: var(--secondary) !important;
+    color: #fff !important;
+    border-color: var(--secondary) !important;
+}
+
+.btn-success {
+    background-color: var(--success) !important;
+    border-color: var(--success) !important;
+    color: var(--success-text) !important;
+}
+
+.btn-success:hover,
+.btn-success:focus {
+    background-color: var(--secondary) !important;
+    border-color: var(--secondary) !important;
+    color: var(--success-text) !important;
+}
+
+.sidebar,
+ul.navbar-nav.bg-gradient-primary.sidebar,
+#accordionSidebar.bg-gradient-primary {
+    background-color: var(--bg-sidebar) !important;
+}
+
+.sidebar .sidebar-brand-text,
+.sidebar .sidebar-brand-icon {
+    color: var(--sidebar-brand-color) !important;
+}
+
+.sidebar .nav-item .nav-link {
+    color: #f9fafb !important;
+}
+
+.sidebar .nav-item .nav-link:hover,
+.sidebar .nav-item.active .nav-link {
+    background-color: var(--bg-sidebar-hover) !important;
+}
+
+.table-primary {
+    background-color: var(--primary) !important;
+}
+
+.table-primary th {
+    color: #ffffff !important;
+}
+
+.table-primary th a {
+    color: #ffffff !important;
+    text-decoration: none;
+}
+
+.table-primary th a:hover {
+    color: var(--secondary) !important;
+}

@@ -1,0 +1,118 @@
+﻿@using HouseReservation.Contracts.Models.ViewModels
+@using System.Globalization
+@model DashboardViewModel
+@{
+	ViewData["Title"] = "Panel Administracyjny";
+}
+<div class="row">
+	<div class="col-xl-3 col-md-6 mb-4">
+		<div class="card border-left-primary shadow h-100 py-2">
+			<div class="card-body">
+				<div class="row no-gutters align-items-center">
+					<div class="col mr-2">
+						<div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Użytkownicy</div>
+						<div class="h5 mb-0 font-weight-bold ">@Model.UserCount</div>
+					</div>
+					<div class="col-auto">
+						<i class="fas fa-users fa-2x text-gray-300"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-xl-3 col-md-6 mb-4">
+		<div class="card border-left-success shadow h-100 py-2">
+			<div class="card-body">
+				<div class="row no-gutters align-items-center">
+					<div class="col mr-2">
+						<div class="text-xs font-weight-bold text-success text-uppercase mb-1">Domki</div>
+						<div class="h5 mb-0 font-weight-bold ">@Model.HouseCount</div>
+					</div>
+					<div class="col-auto">
+						<i class="fas fa-home fa-2x text-gray-300"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-xl-3 col-md-6 mb-4">
+		<div class="card border-left-info shadow h-100 py-2">
+			<div class="card-body">
+				<div class="row no-gutters align-items-center">
+					<div class="col mr-2">
+						<div class="text-xs font-weight-bold text-info text-uppercase mb-1">Przychód pewny</div>
+						<div class="h5 mb-0 font-weight-bold ">@Model.SureEarnings.ToString("C")</div>
+					</div>
+					<div class="col-auto">
+						<i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-xl-3 col-md-6 mb-4">
+		<div class="card border-left-info shadow h-100 py-2">
+			<div class="card-body">
+				<div class="row no-gutters align-items-center">
+					<div class="col mr-2">
+						<div class="text-xs font-weight-bold text-info text-uppercase mb-1">Przychód możliwy</div>
+						<div class="h5 mb-0 font-weight-bold ">@Model.PossibleEarnings.ToString("C")</div>
+					</div>
+					<div class="col-auto">
+						<i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="card shadow mb-4">
+	<div class="card-header py-3">
+		<h6 class="m-0 font-weight-bold text-primary">Earnings Overview</h6>
+	</div>
+	<div class="card-body">
+		<div class="chart-pie pt-4 pb-2">
+			<canvas id="earningsPieChart"></canvas>
+		</div>
+		<div class="mt-4 text-center small">
+			<span class="me-2">
+				<i class="fas fa-circle text-success"></i> Sure Earnings
+			</span>
+			<span class="me-2">
+				<i class="fas fa-circle text-warning"></i> Possible Earnings
+			</span>
+		</div>
+	</div>
+</div>
+
+<script>
+	const ctx = document.getElementById("earningsPieChart");
+	const earningsPieChart = new Chart(ctx, {
+		type: 'doughnut',
+		data: {
+		labels: ["Sure Earnings", "Possible Earnings"],
+		datasets: [{
+			data: [@(Model.SureEarnings.ToString(CultureInfo.InvariantCulture)), @(Model.PossibleEarnings.ToString(CultureInfo.InvariantCulture))],
+			backgroundColor: ['#1cc88a', '#f6c23e'],
+			hoverBackgroundColor: ['#17a673', '#f4b619'],
+			hoverBorderColor: "rgba(234, 236, 244, 1)",
+			}],
+		},
+		options: {
+			maintainAspectRatio: false,
+			tooltips: {
+				backgroundColor: "rgb(255,255,255)",
+				bodyColor: "#858796",
+				borderColor: '#dddfeb',
+				borderWidth: 1,
+			},
+			legend: {
+				display: false
+			},
+			cutoutPercentage: 60,
+		},
+	});
+</script>
+
+

@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] – Panel Admina</title>
+    <link href="~/lib/sb-admin-2/css/sb-admin-2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/HouseReservationApp.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <link href="~/css/sb-admin-2-custom.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body id="page-top">
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                <div class="sidebar-brand-icon"><i class="fas fa-laugh-wink"></i></div>
+                <div class="sidebar-brand-text mx-3">Admin</div>
+            </a>
+            <hr class="sidebar-divider my-0" />
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                    <i class="fas fa-fw fa-tachometer-alt"></i><span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Earnings">
+                    <i class="fas fa-fw fa-tachometer-alt"></i><span>Earnings</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Admin" asp-controller="User" asp-action="Index">
+                    <i class="fas fa-fw fa-users"></i><span>Użytkownicy</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-fw fa-users"></i><span>Back to app</span>
+                </a>
+            </li>
+        </ul>
+        <!-- End of sidebar -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    <form class="form-inline align-items-center ms-3">
+                        <div class="theme-toggle-wrapper">
+                            <span class="theme-icon">🌞</span>
+                            <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                                <span class="toggle-slider"></span>
+                            </button>
+                            <span class="theme-icon">🌙</span>
+                        </div>
+                    </form>
+                </nav>
+                <div class="main-content container-fluid">
+                    @RenderBody()
+                    @RenderSection("Scripts", required: false)
+                </div>
+            </div>
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>© TwojaFirma 2025</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/sb-admin-2/js/sb-admin-2.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/theme-toggle.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -15,7 +15,8 @@
     @addTagHelper *, Microsoft.AspNetCore.Identity.UI
 
     @{
-        var showUsersButton = User.IsInRole("User") || User.IsInRole("Manager") || User.IsInRole("Admin");
+        var isAtLeastUser = User.IsInRole("User") || User.IsInRole("Manager") || User.IsInRole("Admin");
+        var showAdminPanelButton = User.IsInRole("Manager") || User.IsInRole("Admin");
     }
 
     <header>
@@ -28,18 +29,24 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        @if (showUsersButton)
+                        @if (showAdminPanelButton)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">Users</a>
+                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Management Panel</a>
                             </li>
                         }
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                        @if (isAtLeastUser)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="HouseManagement" asp-action="MyHouses">My Houses</a>
+                            </li>
+                        }
+                        @if (isAtLeastUser)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Reservation" asp-action="MyReservations">My Reservations</a>
+                            </li>
+                        }
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

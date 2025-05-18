@@ -36,6 +36,10 @@ namespace HouseReservationApp.Migrations
                     b.Property<int>("Bedrooms")
                         .HasColumnType("int");
 
+                    b.Property<string>("City")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("Country")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -109,35 +113,23 @@ namespace HouseReservationApp.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<int>("HouseId")
                         .HasColumnType("int");
 
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("HouseId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Reservations");
                 });
@@ -393,7 +385,15 @@ namespace HouseReservationApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("HouseReservation.Core.Models.User", "User")
+                        .WithMany("Reservations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("House");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -455,6 +455,8 @@ namespace HouseReservationApp.Migrations
             modelBuilder.Entity("HouseReservation.Core.Models.User", b =>
                 {
                     b.Navigation("Houses");
+
+                    b.Navigation("Reservations");
                 });
 #pragma warning restore 612, 618
         }

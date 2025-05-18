@@ -46,5 +46,7 @@ namespace HouseReservation.Core.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<House> Houses { get; set; } = [];
+        public ICollection<Reservation> Reservations { get; set; } = [];
+
     }
 }

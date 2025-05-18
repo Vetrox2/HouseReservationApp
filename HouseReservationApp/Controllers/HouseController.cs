@@ -1,37 +1,68 @@
-﻿using HouseReservation.Core.Models;
-using HouseReservation.Infrastructure.Data;
+﻿using HouseReservation.Contracts.Models.ViewModels;
+using HouseReservation.Core.Services.Interfaces;
+using HouseReservation.Infrastructure.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace HouseReservation.Web.Controllers
 {
-    public class HouseController : Controller
+    public class HouseController(IHouseService houseService, IReservationService reservationService) : Controller
     {
-        private readonly HouseReservationContext _db;
-        public HouseController(HouseReservationContext db)
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
         {
-            _db = db;
-        }
+            var house = await houseService.GetHouseDetailAsync(id);
+            if (house == null) return NotFound();
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-        public IActionResult Create()
-        {
-            return View();
+            var vm = new HouseReservationViewModel
+            {
+                House = house,
+                Reservation = new ReservationCreateViewModel
+                {
+                    HouseId = id,
+                    PricePerNight = house.PricePerNight
+                }
+            };
+
+            ViewData["ExistingReservations"] =
+                await reservationService.GetReservationsForHouseAsync(id);
+
+            return View(vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(House house)
+        public async Task<IActionResult> Reserve(HouseReservationViewModel vm)
         {
-            if (ModelState.IsValid)
+            if (vm.Reservation.CheckInDate >= vm.Reservation.CheckOutDate)
             {
-                _db.Add(house);
-                await _db.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("", "Check-out must be after check-in. You cannot book for less than one night.");
             }
-            return View();
+
+            var overlap = await reservationService
+                .IsOverlappingAsync(vm.Reservation.HouseId,
+                                   vm.Reservation.CheckInDate,
+                                   vm.Reservation.CheckOutDate);
+            if (overlap)
+                ModelState.AddModelError("", "These dates are already booked.");
+
+            var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdValue, out var userId))
+                return Forbid();
+            vm.Reservation.UserId = userId;
+
+            if (!ModelState.IsValid)
+            {
+                vm.House = await houseService.GetHouseDetailAsync(vm.Reservation.HouseId);
+                ViewData["ExistingReservations"] =
+                    await reservationService.GetReservationsForHouseAsync(vm.Reservation.HouseId);
+
+                return View("Details", vm);
+            }
+
+            await reservationService.ReserveHouseAsync(vm.Reservation);
+            return RedirectToAction(nameof(Details), new { id = vm.Reservation.HouseId });
         }
     }
 }
