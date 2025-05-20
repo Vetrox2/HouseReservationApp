@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using System.Globalization
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -17,6 +18,8 @@
     @{
         var isAtLeastUser = User.IsInRole("User") || User.IsInRole("Manager") || User.IsInRole("Admin");
         var showAdminPanelButton = User.IsInRole("Manager") || User.IsInRole("Admin");
+
+        var currentCulture = CultureInfo.CurrentUICulture.Name;
     }
 
     <header>
@@ -48,6 +51,16 @@
                             </li>
                         }
                     </ul>
+
+                    <form id="langForm" method="post" asp-controller="Language" asp-action="SetLanguage" class="d-inline">
+                        <select name="culture" onchange="this.form.submit()" class="form-select form-select-sm" style="width: auto; display: inline-block;">
+                            <option value="en-US" selected="@(currentCulture == "en-US")">🇺🇸 English</option>
+                            <option value="pl-PL" selected="@(currentCulture == "pl-PL")">🇵🇱 Polski</option>
+                            <option value="de-DE" selected="@(currentCulture == "de-DE")">🇩🇪 Deutsch</option>
+                        </select>
+                        <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                    </form>
+
                     <partial name="_LoginPartial" />
                 </div>
             </div>
