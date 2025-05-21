@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using System.Globalization
+@using Microsoft.AspNetCore.Mvc.Localization
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -13,18 +15,21 @@
 <body>
     @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
     @addTagHelper *, Microsoft.AspNetCore.Identity.UI
+    @inject IViewLocalizer ViewLocalizer
 
     @{
         var isAtLeastUser = User.IsInRole("User") || User.IsInRole("Manager") || User.IsInRole("Admin");
         var showAdminPanelButton = User.IsInRole("Manager") || User.IsInRole("Admin");
+
+        var currentCulture = CultureInfo.CurrentUICulture.Name;
     }
 
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HouseReservationApp</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">@ViewLocalizer["AppName"]</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                aria-expanded="false" aria-label="Toggle navigation">
+                        aria-expanded="false" aria-label="@ViewLocalizer["ToggleNavigation"]">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
@@ -32,22 +37,32 @@
                         @if (showAdminPanelButton)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Management Panel</a>
+                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">@ViewLocalizer["ManagementPanel"]</a>
                             </li>
                         }
                         @if (isAtLeastUser)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="HouseManagement" asp-action="MyHouses">My Houses</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="HouseManagement" asp-action="MyHouses">@ViewLocalizer["MyHouses"]</a>
                             </li>
                         }
                         @if (isAtLeastUser)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Reservation" asp-action="MyReservations">My Reservations</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Reservation" asp-action="MyReservations">@ViewLocalizer["MyReservations"]</a>
                             </li>
                         }
                     </ul>
+
+                    <form id="langForm" method="post" asp-controller="Language" asp-action="SetLanguage" class="d-inline">
+                        <select name="culture" onchange="this.form.submit()" class="form-select form-select-sm" style="width: auto; display: inline-block;">
+                            <option value="en-US" selected="@(currentCulture == "en-US")">@ViewLocalizer["LanguageEnglish"]</option>
+                            <option value="pl-PL" selected="@(currentCulture == "pl-PL")">@ViewLocalizer["LanguagePolish"]</option>
+                            <option value="de-DE" selected="@(currentCulture == "de-DE")">@ViewLocalizer["LanguageGerman"]</option>
+                        </select>
+                        <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                    </form>
+
                     <partial name="_LoginPartial" />
                 </div>
             </div>
@@ -61,7 +76,8 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - HouseReservationApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            @ViewLocalizer["FooterText", "2025"]
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">@ViewLocalizer["Privacy"]</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

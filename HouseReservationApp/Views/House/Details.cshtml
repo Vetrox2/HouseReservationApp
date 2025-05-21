@@ -1,8 +1,10 @@
 ﻿@using HouseReservation.Contracts.Models.ViewModels
 @using HouseReservation.Core.Models
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc.Localization
 @model HouseReservationViewModel
 @inject SignInManager<User> SignInManager
+@inject IViewLocalizer ViewLocalizer
 
 @{
 	var existing = ViewData["ExistingReservations"]
@@ -11,83 +13,79 @@
 }
 
 <div class="row">
-	<div class="col-md-6">
-		<img src="@Model.House.ImageUrl"
-		class="img-fluid rounded house-img" />
-	</div>
-	<div class="col-md-6">
-		<h1>@Model.House.Title</h1>
-		<p>@Model.House.Description</p>
-		<ul>
-			<li>Price: @Model.House.PricePerNight.ToString("C")</li>
-			<li>Size: @Model.House.SizeM2 m²</li>
-			<li>Bedrooms: @Model.House.Bedrooms</li>
-			<li>Bathrooms: @Model.House.Bathrooms</li>
-			<li>Address: @Model.House.Address</li>
-		</ul>
-	</div>
+    <div class="col-md-6">
+        <img src="@Model.House.ImageUrl" class="img-fluid rounded house-img" />
+    </div>
+    <div class="col-md-6">
+        <h1>@Model.House.Title</h1>
+        <p>@Model.House.Description</p>
+        <ul>
+            <li>@ViewLocalizer["PriceLabel"] @Model.House.PricePerNight.ToString("C")</li>
+            <li>@ViewLocalizer["SizeLabel"] @Model.House.SizeM2 m²</li>
+            <li>@ViewLocalizer["BedroomsLabel"] @Model.House.Bedrooms</li>
+            <li>@ViewLocalizer["BathroomsLabel"] @Model.House.Bathrooms</li>
+            <li>@ViewLocalizer["AddressLabel"] @Model.House.Address</li>
+        </ul>
+    </div>
 </div>
-
 
 <hr />
 
-<h4>Existing Reservations</h4>
+<h4>@ViewLocalizer["ExistingReservations"]</h4>
 @if (!existing.Any())
 {
-	<p>No reservations.</p>
+    <p>@ViewLocalizer["NoReservations"]</p>
 }
 else
 {
-	<ul class="list-group mb-4">
-		@{
-			var sortedReservations = existing.OrderBy(r => r.CheckInDate);
-		}
-		@foreach (var r in sortedReservations)
-		{
-			<li class="list-group-item">
-				@r.CheckInDate.ToString("dd.MM.yyyy") → @r.CheckOutDate.ToString("dd.MM.yyyy")
-			</li>
-		}
-	</ul>
+    <ul class="list-group mb-4">
+        @{
+            var sortedReservations = existing.OrderBy(r => r.CheckInDate);
+        }
+        @foreach (var r in sortedReservations)
+        {
+            <li class="list-group-item">
+                @r.CheckInDate.ToString("dd.MM.yyyy") → @r.CheckOutDate.ToString("dd.MM.yyyy")
+            </li>
+        }
+    </ul>
 }
 @if (!SignInManager.IsSignedIn(User))
 {
-	<div class="alert alert-warning">
-		Please <a asp-area="Identity" asp-page="/Account/Login">log in</a> to make a reservation.
-	</div>
+    <div class="alert alert-warning">
+        @ViewLocalizer["LoginPrompt"] <a asp-area="Identity" asp-page="/Account/Login">@ViewLocalizer["LoginLink"]</a>
+    </div>
 }
 else
 {
-	<form asp-action="Reserve" method="post" class="row g-3">
-		@Html.AntiForgeryToken()
+    <form asp-action="Reserve" method="post" class="row g-3">
+        @Html.AntiForgeryToken()
 
-		<input asp-for="Reservation.HouseId" type="hidden" />
-		<input asp-for="Reservation.PricePerNight" type="hidden" />
-		
-		<div class="col-md-4">
-			<label asp-for="Reservation.CheckInDate" class="form-label">Check-in</label>
-			<input name="Reservation.CheckInDate" type="date" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+        <input asp-for="Reservation.HouseId" type="hidden" />
+        <input asp-for="Reservation.PricePerNight" type="hidden" />
 
-			<span asp-validation-for="Reservation.CheckInDate" class="text-danger"></span>
-		</div>
-		<div class="col-md-4">
-			<label asp-for="Reservation.CheckOutDate" class="form-label">Check-out</label>
-			<input name="Reservation.CheckOutDate" type="date" class="form-control" value="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
-			<span asp-validation-for="Reservation.CheckOutDate" class="text-danger"></span>
-		</div>
+        <div class="col-md-4">
+            <label asp-for="Reservation.CheckInDate" class="form-label">@ViewLocalizer["CheckIn"]</label>
+            <input name="Reservation.CheckInDate" type="date" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            <span asp-validation-for="Reservation.CheckInDate" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Reservation.CheckOutDate" class="form-label">@ViewLocalizer["CheckOut"]</label>
+            <input name="Reservation.CheckOutDate" type="date" class="form-control" value="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+            <span asp-validation-for="Reservation.CheckOutDate" class="text-danger"></span>
+        </div>
 
-		<div class="col-md-4">
-			<label class="form-label">Total Price</label>
-			<p id="totalPrice" class="fw-bold">-</p>
-		</div>
+        <div class="col-md-4">
+            <label class="form-label">@ViewLocalizer["TotalPrice"]</label>
+            <p id="totalPrice" class="fw-bold">-</p>
+        </div>
 
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-		@Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
-		<div class="col-12">
-			<button type="submit" class="btn btn-success">Reserve</button>
-		</div>
-	</form>
+        <div class="col-12">
+            <button type="submit" class="btn btn-success">@ViewLocalizer["Reserve"]</button>
+        </div>
+    </form>
 }
 
 @section Scripts {
